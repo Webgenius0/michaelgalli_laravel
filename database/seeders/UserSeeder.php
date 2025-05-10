@@ -2,10 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class UserSeeder extends Seeder
 {
@@ -34,11 +35,56 @@ class UserSeeder extends Seeder
             ]);
 
             DB::table('users')->insert([
-                ['id' => 1, 'name' => 'developer', 'email' => 'developer@developer.com', 'password' => Hash::make('12345678'), 'otp_verified_at' => now()],
-                ['id' => 2, 'name' => 'Admin', 'email' => 'admin@admin.com', 'password' => Hash::make('12345678'), 'otp_verified_at' => now()],
-                ['id' => 3, 'name' => 'Retailer', 'email' => 'retailer@retailer.com', 'password' => Hash::make('12345678'), 'otp_verified_at' => now()],
-                ['id' => 4, 'name' => 'Customer', 'email' => 'customer@customer.com', 'password' => Hash::make('12345678'), 'otp_verified_at' => now()]
+                [
+                    'id' => 1,
+                    'first_name' => 'Developer',
+                    'last_name' => '',
+                    'email' => 'developer@developer.com',
+                    'phone_number' => '1111111111',
+                    'password' => Hash::make('12345678'),
+                    'otp_verified_at' => Carbon::now(),
+                    'status' => 'active',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'id' => 2,
+                    'first_name' => 'Admin',
+                    'last_name' => '',
+                    'email' => 'admin@admin.com',
+                    'phone_number' => '2222222222',
+                    'password' => Hash::make('12345678'),
+                    'otp_verified_at' => Carbon::now(),
+                    'status' => 'active',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'id' => 3,
+                    'first_name' => 'Retailer',
+                    'last_name' => '',
+                    'email' => 'retailer@retailer.com',
+                    'phone_number' => '3333333333',
+                    'password' => Hash::make('12345678'),
+                    'otp_verified_at' => Carbon::now(),
+                    'status' => 'active',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'id' => 4,
+                    'first_name' => 'Customer',
+                    'last_name' => '',
+                    'email' => 'customer@customer.com',
+                    'phone_number' => '4444444444',
+                    'password' => Hash::make('12345678'),
+                    'otp_verified_at' => Carbon::now(),
+                    'status' => 'active',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
             ]);
+
 
             DB::table('role_has_permissions')->insert([
                 ['permission_id' => 1, 'role_id' => 1],

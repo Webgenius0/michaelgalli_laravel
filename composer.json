@@ -16,6 +16,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.18",
         "laravel/tinker": "^2.9",
+        "propaganistas/laravel-phone": "^6.0",
         "spatie/laravel-permission": "^6.10",
         "stripe/stripe-php": "^17.1",
         "tymon/jwt-auth": "^2.1",

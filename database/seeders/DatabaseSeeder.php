@@ -18,5 +18,6 @@ class DatabaseSeeder extends Seeder
         $this->call(NotificationSeeder::class);
         $this->call(PageSeeder::class); 
         $this->call(TransactionSeeder::class);
+        $this->call(QuizSeeder::class);
     }
 }

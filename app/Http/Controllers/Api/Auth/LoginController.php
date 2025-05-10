@@ -16,12 +16,13 @@ class LoginController extends Controller
     public $select;
     public function __construct()
     {
-        $this->select = ['id', 'name', 'email', 'avatar'];   
+        $this->select = ['id', 'first_name','last_name', 'email', 'avatar'];   
     }
 
     public function Login(Request $request)
     {
         try {
+            
             $validator = Validator::make($request->all(), [
                 'email'    => 'required|email|exists:users,email',
                 'password' => 'required|string|min:6',

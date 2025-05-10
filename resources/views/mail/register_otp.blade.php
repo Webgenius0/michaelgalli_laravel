@@ -6,13 +6,13 @@
                {{ htmlspecialchars($header_message) }}
             </a>
         </div>
-        <p style="font-size:1.1em">Hi {{$user->name}},</p>
-        <p>We received a request to reset your password for your {{ config('app.name') }} account. Use the OTP below to proceed. This code is valid for 1 hour.</p>
+        <p style="font-size:1.1em">Hello {{$user->name}},</p>
+        <p>Welcome to {{ config('app.name') }}! To complete your registration, please use the following One-Time Password (OTP). This code is valid for 10 minutes.</p>
         <h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;">
             {{ $otp }}
         </h2>
-        <p style="font-size:0.9em;">If you didn’t request a password reset, you can safely ignore this email.</p>
-        <p style="font-size:0.9em;">Stay safe,<br />The {{ config('app.name') }} Team</p>
+        <p style="font-size:0.9em;">If you did not initiate this request, please ignore this email.</p>
+        <p style="font-size:0.9em;">Thank you for joining us!<br />Best regards,<br />The {{ config('app.name') }} Team</p>
         <hr style="border:none;border-top:1px solid #eee" />
         <div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">
             <p>{{ config('app.name') }} Inc.</p>

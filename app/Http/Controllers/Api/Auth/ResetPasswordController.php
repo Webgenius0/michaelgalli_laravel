@@ -28,15 +28,16 @@ class ResetPasswordController extends Controller
             'email' => 'required|email|exists:users,email',
         ]);
         try {
+
             $email = $request->input('email');
-            $otp   = rand(1000, 9999);
+            $otp   = rand(100000, 999999);
             $user  = User::where('email', $email)->first();
 
             if ($user) {
                 Mail::to($email)->send(new OtpMail($otp, $user, 'Reset Your Password'));
 
                 $user->otp            = $otp;
-                $user->otp_expires_at = Carbon::now()->addMinutes(60);
+                $user->otp_expires_at = Carbon::now()->addMinutes(10);
                 $user->save();
 
                 return Helper::jsonResponse(true, 'OTP Code Sent Successfully Please Check Your Email.', 200);
@@ -53,7 +54,7 @@ class ResetPasswordController extends Controller
     {
         $request->validate([
             'email' => 'required|email|exists:users,email',
-            'otp'   => 'required|digits:4',
+            'otp'   => 'required|digits:6',
         ]);
         
         try {
@@ -72,7 +73,7 @@ class ResetPasswordController extends Controller
             if ($user->otp !== $otp) {
                 return Helper::jsonErrorResponse('Invalid OTP', 400);
             }
-            $token = Str::random(60);
+            $token = Str::random(120);
 
             $user->otp = null;
             $user->otp_expires_at = null;

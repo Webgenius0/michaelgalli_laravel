@@ -30,6 +30,28 @@
                         <span class="side-menu__label">Dashboard</span>
                     </a>
                 </li>
+
+                
+
+
+                 <li class="slide">
+                    <a class="side-menu__item" data-bs-toggle="slide" href="#">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32">
+                            <rect width="416" height="416" rx="48" ry="48" />
+                            <path d="m192 256 128 0" />
+                        </svg>
+                        <span class="side-menu__label">Recipe Item</span><i class="angle fa fa-angle-right"></i>
+                    </a>
+
+                    <ul class="slide-menu">
+                        <li><a href="{{ route('admin.protein.index') }}" class="slide-item">Protein</a></li>
+                        <li><a href="{{ route('admin.calories.index') }}" class="slide-item">Caloreis</a></li>
+                       
+                       
+                    </ul>
+                </li>
+
+
                 <li class="slide">
                     <a class="side-menu__item {{  request()->routeIs('category') ? 'has-link' : '' }}" href="{{ route('admin.category.index') }}">
                         <i class="fa-solid fa-list side-menu__icon"></i>

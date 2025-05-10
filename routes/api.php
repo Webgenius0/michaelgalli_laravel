@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\Frontend\FaqController;
 use App\Http\Controllers\Api\Frontend\HomeController;
 use App\Http\Controllers\Api\Frontend\ImageController;
 use App\Http\Controllers\Api\Frontend\PostController;
+use App\Http\Controllers\Api\Frontend\QuestionController;
 use App\Http\Controllers\Api\Frontend\SubcategoryController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\Frontend\SettingsController;
@@ -32,6 +33,15 @@ Route::get('/social/links', [SocialLinksController::class, 'index']);
 Route::get('/settings', [SettingsController::class, 'index']);
 Route::get('/faq', [FaqController::class, 'index']);
 Route::post('subscriber/store',[SubscriberController::class, 'store'])->name('subscriber.store');
+
+
+Route::get('/question-list', [QuestionController::class, 'index']);
+
+
+
+
+
+
 
 /*
 # Post
@@ -67,7 +77,7 @@ Route::group(['middleware' => 'guest:api'], function ($router) {
     Route::post('login', [LoginController::class, 'login'])->name('login');
     //forgot password
     Route::post('/forget-password', [ResetPasswordController::class, 'forgotPassword']);
-    Route::post('/otp-token', [ResetPasswordController::class, 'MakeOtpToken']);
+    Route::post('/password-verify-otp', [ResetPasswordController::class, 'MakeOtpToken']);
     Route::post('/reset-password', [ResetPasswordController::class, 'ResetPassword']);
     //social login
     Route::post('/social-login', [SocialLoginController::class, 'SocialLogin']);
@@ -93,6 +103,12 @@ Route::middleware(['auth:api'])->controller(FirebaseTokenController::class)->pre
     Route::post("token/get", "getToken");
     Route::post("token/delete", "deleteToken");
 })->middleware('auth:api');
+
+
+Route::middleware(['auth:api'])->controller(QuestionController::class)->prefix('question')->group(function () {
+        Route::post('/store', 'store');
+});
+
 
 /*
 # In App Notification Route
