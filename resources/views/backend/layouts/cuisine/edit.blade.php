@@ -1,4 +1,4 @@
-@extends('backend.app', ['title' => 'Update Protein'])
+@extends('backend.app', ['title' => 'Update Cuisine'])
 
 @section('content')
 
@@ -11,11 +11,11 @@
 
             <div class="page-header">
                 <div>
-                    <h1 class="page-title">Protein</h1>
+                    <h1 class="page-title">Cuisine</h1>
                 </div>
                 <div class="ms-auto pageheader-btn">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="javascript:void(0);">Protein</a></li>
+                        <li class="breadcrumb-item"><a href="javascript:void(0);">Cuisine</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Update</li>
                     </ol>
                 </div>
@@ -28,14 +28,14 @@
                         <div class="tab-pane active show" id="editProfile">
                             <div class="card">
                                 <div class="card-body border-0">
-                                    <form class="form-horizontal" method="post" action="{{ route('admin.calories.update', $protein->id) }}" enctype="multipart/form-data">
+                                    <form class="form-horizontal" method="post" action="{{ route('admin.cuisine.update', $carb->id) }}" enctype="multipart/form-data">
                                         @csrf
                                         @method('POST')
                                         <div class="row mb-4">
 
                                             <div class="form-group">
                                                 <label for="username" class="form-label">Name:</label>
-                                                <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" placeholder="Name" id="" value="{{ $protein->name }}">
+                                                <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" placeholder="Name" id="" value="{{ $carb->name }}">
                                                 @error('name')
                                                 <span class="text-danger">{{ $message }}</span>
                                                 @enderror

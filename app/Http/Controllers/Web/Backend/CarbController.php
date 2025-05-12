@@ -6,11 +6,12 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Calories;
-use App\Models\Protein;
+use App\Models\Carb;
+
 use Exception;
 use Yajra\DataTables\Facades\DataTables;
 
-class CaloriesController extends Controller
+class CarbController extends Controller
 {
 
 
@@ -20,7 +21,7 @@ class CaloriesController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Calories::all();
+            $data = Carb::all();
             return DataTables::of($data)
                 ->addIndexColumn()
 
@@ -39,7 +40,7 @@ class CaloriesController extends Controller
                 ->rawColumns(['image', 'status', 'action'])
                 ->make();
         }
-        return view("backend.layouts.calories.index");
+        return view("backend.layouts.carbs.index");
     }
 
     /**
@@ -47,7 +48,7 @@ class CaloriesController extends Controller
      */
     public function create()
     {
-        return view('backend.layouts.calories.create');
+        return view('backend.layouts.carbs.create');
     }
 
     /**
@@ -58,16 +59,16 @@ class CaloriesController extends Controller
 
 
         try {
-            $protein = new Calories();
-            $protein->name = $request->name;
-            $protein->save();
+            $carb = new Carb();
+            $carb->name = $request->name;
+            $carb->save();
 
-            session()->put('t-success', 'Calories created successfully');
+            session()->put('t-success', 'Carb created successfully');
         } catch (Exception $e) {
             session()->put('t-error', $e->getMessage());
         }
 
-        return redirect()->route('admin.calories.index')->with('t-success', 'Calories created successfully');
+        return redirect()->route('admin.carb.index')->with('t-success', 'Carb created successfully');
     }
 
     
@@ -77,8 +78,8 @@ class CaloriesController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        $protein = Calories::find($id);
-        return view('backend.layouts.calories.edit', compact('protein'));
+        $carb = Carb::find($id);
+        return view('backend.layouts.carbs.edit', compact('carb'));
     }
 
     /**
@@ -88,16 +89,16 @@ class CaloriesController extends Controller
     {
 
         try {
-            $protein = Calories::find($id);
-            $protein->name = $request->name;
-            $protein->save();
+            $carb = Carb::find($id);
+            $carb->name = $request->name;
+            $carb->save();
 
             session()->put('t-success', 'Calories updated successfully');
         } catch (Exception $e) {
             session()->put('t-error', $e->getMessage());
         }
 
-        return redirect()->route('admin.calories.index');
+        return redirect()->route('admin.carb.index');
     }
 
     /**
@@ -106,9 +107,9 @@ class CaloriesController extends Controller
     public function destroy(string $id)
     {
         try {
-           $protein = Calories::find($id);
+           $carb = Carb::find($id);
 
-           $protein->delete();
+           $carb->delete();
 
             return response()->json([
                 'status' => 't-success',
