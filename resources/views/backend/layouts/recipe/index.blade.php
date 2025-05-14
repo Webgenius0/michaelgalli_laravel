@@ -1,4 +1,4 @@
-@extends('backend.app', ['title' => 'Post'])
+@extends('backend.app', ['title' => 'Recipe Management'])
 
 @push('styles')
 <link href="{{ asset('default/datatable.css') }}" rel="stylesheet" />  
@@ -17,11 +17,11 @@
             <!-- PAGE-HEADER -->
             <div class="page-header">
                 <div>
-                    <h1 class="page-title">Post</h1>
+                    <h1 class="page-title">Recipe Management</h1>
                 </div>
                 <div class="ms-auto pageheader-btn">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="javascript:void(0);">Post</a></li>
+                        <li class="breadcrumb-item"><a href="javascript:void(0);">Recipe Management</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Index</li>
                     </ol>
                 </div>
@@ -35,7 +35,7 @@
                         <div class="card-header border-bottom">
                             <h3 class="card-title mb-0">List</h3>
                             <div class="card-options ms-auto">
-                                <a href="{{ route('admin.post.create') }}" class="btn btn-primary btn-sm">Add</a>
+                                <a href="{{ route('admin.recipe.create') }}" class="btn btn-primary btn-sm">Add</a>
                             </div>
                         </div>
                         <div class="card-body">

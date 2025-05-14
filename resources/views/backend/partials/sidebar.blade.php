@@ -39,7 +39,7 @@
 
 
                 @php
-                    $isRecipeActive = request()->routeIs('admin.protein.*','admin.cuisine.*','admin.health_goal.*', 'admin.calories.*', 'admin.carb.*');
+                    $isRecipeActive = request()->routeIs('admin.protein.*','admin.time_to_clock.*', 'admin.cuisine.*','admin.health_goal.*', 'admin.calories.*', 'admin.carb.*');
                 @endphp
 
                 <li class="slide {{ $isRecipeActive ? 'is-expanded' : '' }}">
@@ -55,6 +55,13 @@
                     </a>
 
                     <ul class="slide-menu">
+
+                        <li>
+                            <a href="{{ route('admin.category.index') }}"
+                                class="slide-item {{ request()->routeIs('admin.category.*') ? 'active' : '' }}">
+                                Categories
+                            </a>
+                        </li>
                         <li>
                             <a href="{{ route('admin.protein.index') }}"
                                 class="slide-item {{ request()->routeIs('admin.protein.*') ? 'active' : '' }}">
@@ -87,30 +94,37 @@
                                 Health Goal
                             </a>
                         </li>
+
+                         <li>
+                            <a href="{{ route('admin.time_to_clock.index') }}"
+                                class="slide-item {{ request()->routeIs('admin.time_to_clock.*') ? 'active' : '' }}">
+                                Time To Clock
+                            </a>
+                        </li>
                     </ul>
                 </li>
 
 
 
-                <li class="slide">
+                {{-- <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('category') ? 'has-link' : '' }}"
                         href="{{ route('admin.category.index') }}">
                         <i class="fa-solid fa-list side-menu__icon"></i>
                         <span class="side-menu__label">Category</span>
                     </a>
-                </li>
-                <li class="slide">
+                </li> --}}
+                {{-- <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('subcategory') ? 'has-link' : '' }}"
                         href="{{ route('admin.subcategory.index') }}">
                         <i class="fa-solid fa-list-check side-menu__icon"></i>
                         <span class="side-menu__label">Sub Category</span>
                     </a>
-                </li>
+                </li> --}}
                 <li class="slide">
-                    <a class="side-menu__item {{ request()->routeIs('post') ? 'has-link' : '' }}"
-                        href="{{ route('admin.post.index') }}">
+                    <a class="side-menu__item {{ request()->routeIs('recipe') ? 'has-link' : '' }}"
+                        href="{{ route('admin.recipe.index') }}">
                         <i class="fa-solid fa-blog side-menu__icon"></i>
-                        <span class="side-menu__label">Post</span>
+                        <span class="side-menu__label">Recipe manage</span>
                     </a>
                 </li>
                 <li>
