@@ -105,9 +105,9 @@
                                                     </div>
                                                     @if ($step->image_url)
                                                         <div class="ml-4">
-                                                            <img src="{{ asset('storage/' . $step->image_url) }}"
+                                                            <img src="{{  $step->image_url }}"
                                                                 alt="Step Image"
-                                                                class="w-32 h-24 object-cover rounded-md shadow-md border">
+                                                                class="w-25 h-24 object-cover rounded-md shadow-md border">
                                                         </div>
                                                     @endif
                                                 </div>
