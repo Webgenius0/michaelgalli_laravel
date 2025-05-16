@@ -45,11 +45,10 @@
                                         <tr>
                                             <th class="bg-transparent border-bottom-0 wp-15">ID</th>
                                             <th class="bg-transparent border-bottom-0 wp-15">Title</th>
-                                            <th class="bg-transparent border-bottom-0 wp-15">Category</th>
-                                            <th class="bg-transparent border-bottom-0 wp-15">Subcategory</th>
-                                            <th class="bg-transparent border-bottom-0 wp-15">Author</th>
-                                            <th class="bg-transparent border-bottom-0">Thumbnail</th>
-                                            <th class="bg-transparent border-bottom-0">Status</th>
+                                            <th class="bg-transparent border-bottom-0 wp-15">Description</th>
+                                            <th class="bg-transparent border-bottom-0 wp-15">Image</th>
+                                            <th class="bg-transparent border-bottom-0 wp-15">Ingredients</th>
+                                            
                                             <th class="bg-transparent border-bottom-0">Action</th>
                                         </tr>
                                     </thead>
@@ -104,7 +103,7 @@
                 pagingType: "full_numbers",
                 dom: "<'row justify-content-between table-topbar'<'col-md-4 col-sm-3'l><'col-md-5 col-sm-5 px-0'f>>tipr",
                 ajax: {
-                    url: "{{ route('admin.post.index') }}",
+                    url: "{{ route('admin.recipe.index') }}",
                     type: "GET",
                 },
 
@@ -120,36 +119,27 @@
                         orderable: true,
                         searchable: true
                     },
+                   
                     {
-                        data: 'category',
-                        name: 'category',
+                        data: 'short_description',
+                        name: 'short_description',
                         orderable: true,
                         searchable: true
                     },
                     {
-                        data: 'subcategory',
-                        name: 'subcategory',
-                        orderable: true,
-                        searchable: true
-                    },
-                    {
-                        data: 'author',
-                        name: 'author',
-                        orderable: true,
-                        searchable: true
-                    },
-                    {
-                        data: 'thumbnail',
-                        name: 'thumbnail',
+                        data: 'image_url',
+                        name: 'image_url',
                         orderable: false,
                         searchable: false
                     },
+
                     {
-                        data: 'status',
-                        name: 'status',
+                        data: 'ingredients',
+                        name: 'ingredients',
                         orderable: false,
                         searchable: false
                     },
+                    
                     {
                         data: 'action',
                         name: 'action',
@@ -246,7 +236,7 @@
         window.location.href = url.replace(':id', id);
     }
     function goToOpen(id) {
-        let url = "{{ route('admin.post.show', ':id') }}";
+        let url = "{{ route('admin.recipe.show', ':id') }}";
         window.location.href = url.replace(':id', id);
     }
 </script>
