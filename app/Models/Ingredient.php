@@ -6,12 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ingredient extends Model
 {
-    protected $guarded = ['id'];
+    protected $fillable = ['ingredient_section_id', 'name', 'amount', 'is_highlighted'];
 
-    public function recipes()
+    public function section()
     {
-        return $this->belongsToMany(Recipe::class, 'recipe_ingredients')
-            ->withPivot('quantity', 'unit') 
-            ->withTimestamps();
+        return $this->belongsTo(IngredientSection::class, 'ingredient_section_id');
     }
 }

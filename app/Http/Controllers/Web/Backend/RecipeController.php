@@ -2,20 +2,25 @@
 
 namespace App\Http\Controllers\Web\Backend;
 
-use App\Helpers\Helper;
-use App\Models\Post;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Models\Calories;
-use App\Models\Carb;
-use App\Models\Category;
-use App\Models\Image;
-use App\Models\Protein;
-use App\Models\Subcategory;
 use Exception;
-use Illuminate\Http\JsonResponse;
-use Yajra\DataTables\Facades\DataTables;
+use App\Models\Carb;
+use App\Models\Post;
+use App\Models\Image;
+use App\Models\Recipe;
+use App\Helpers\Helper;
+use App\Models\Cuisine;
+use App\Models\Protein;
+use App\Models\Calories;
+use App\Models\Category;
+use App\Models\HealthGoal;
+use App\Models\Subcategory;
+use App\Models\TimeToClock;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 
 class RecipeController extends Controller
@@ -90,69 +95,140 @@ class RecipeController extends Controller
         $proteins = Protein::all();
         $calories = Calories::all();
         $carbs = Carb::all();
-        $proteins = Protein::all();
+        $cuisines = Cuisine::all();
+        $health_goals = HealthGoal::all();
+        $time_to_cooks = TimeToClock::all();
+        $categories = Category::all();
 
 
-        return view('backend.layouts.recipe.create', compact('categories'));
+        return view(
+            'backend.layouts.recipe.create',
+            compact(
+                'categories',
+                'proteins',
+                'calories',
+                'carbs',
+                'cuisines',
+                'health_goals',
+                'time_to_cooks'
+            )
+        );
     }
 
     /**
      * Store a newly created resource in storage.
      */
+
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'title'             => 'required|max:250',
-            'content'           => 'required|string',
-            'thumbnail'         => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'category_id'       => 'required|exists:categories,id',
-            'subcategory_id'    => 'required|exists:subcategories,id',
-            'images'            => 'nullable|array|max:3',
-            'images.*'          => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
+        // dd($request->all());
+        // Validation rules including nested arrays and files
+        $rules = [
+            'title' => 'required|string|max:255',
+            'short_description' => 'nullable|string',
+            'long_description' => 'nullable|string',
+            'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
+            'protein_id' => 'nullable|exists:proteins,id',
+            'calory_id' => 'nullable|exists:calories,id',
+            'carb_id' => 'nullable|exists:carbs,id',
+            'cuisine_id' => 'nullable|exists:cuisines,id',
+            'health_goal_id' => 'nullable|exists:health_goals,id',
+            'time_to_clock_id' => 'nullable|exists:time_to_clocks,id',
+            // 'category_id' => 'nullable|exists:categories,id',
 
-        try {
-            $data = $validator->validated();
+            'sections' => 'required|array',
+            'sections.*.title' => 'required|string|max:255',
+            'sections.*.order' => 'required|integer',
+            'sections.*.ingredients' => 'required|array',
+            'sections.*.ingredients.*.name' => 'required|string|max:255',
+            'sections.*.ingredients.*.amount' => 'required|string|max:255',
+            'sections.*.ingredients.*.is_highlighted' => 'nullable|boolean',
 
-            $post = new Post();
 
-            $post->user_id = auth('web')->user()->id;
+            'instructions' => 'required|array|min:1',
+            'instructions.*.title' => 'required|string|max:255',
+            'instructions.*.step_number' => 'required|integer|min:1',
+            'instructions.*.description' => 'required|string',
+            'instructions.*.image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ];
 
-            if ($request->hasFile('thumbnail')) {
-                $data['thumbnail'] = Helper::fileUpload($request->file('thumbnail'), 'post', time() . '_' . getFileName($request->file('thumbnail')));
+        // $validator = Validator::make($request->all(), $rules);
+
+        // if ($validator->fails()) {
+        //     return redirect()->back()->withErrors($validator)->withInput();
+        // }
+
+        // try {
+            // Start DB transaction
+            // DB::beginTransaction();
+
+            // Handle main thumbnail image upload
+            $thumbnailPath = null;
+            if ($request->hasFile('image_url')) {
+                $thumbnailPath = Helper::fileUpload($request->file('image_url'), 'recipes', 'thumbnail_' . Str::random(10));
             }
 
-            $post->slug = Helper::makeSlug(Post::class, $data['title']);
+            // Create recipe
+            $recipe = Recipe::create([
+                'title' => $request->title,
+                'short_description' => $request->short_description,
+                'long_description' => $request->long_description,
+                'image_url' => $thumbnailPath,
+                'protein_id' => $request->protein_id,
+                'calories_id' => $request->calory_id,
+                'carb_id' => $request->carb_id,
+                'cuisine_id' => $request->cuisine_id,
+                'health_goal_id' => $request->health_goal_id,
+                'time_to_clock_id' => $request->time_to_clock_id,
+                // 'category_id' => $request->category_id,
+            ]);
 
-            $post->title = $data['title'];
-            $post->thumbnail = $data['thumbnail'];
-            $post->content = $data['content'];
-            $post->category_id = $data['category_id'];
-            $post->subcategory_id = $data['subcategory_id'];
-            $post->save();
+            foreach ($request->sections as $sectionData) {
+                $section = $recipe->ingredientSections()->create([
+                    'title' => $sectionData['title'],
+                    'order' => $sectionData['order'],
+                ]);
 
-            if (isset($request['images']) && count($request['images']) > 0 && count($request['images']) <= 3) {
-                foreach ($request['images'] as $image) {
-                    $imageName = 'images_' . Str::random(10);
-                    $image = Helper::fileUpload($image, 'post', $imageName);
-                    Image::create(['post_id' => $post->id, 'path' => $image]);
+                $ingredients = [];
+                foreach ($sectionData['ingredients'] as $ingredient) {
+                    $ingredients[] = [
+                        'name' => $ingredient['name'],
+                        'amount' => $ingredient['amount'],
+                        'is_highlighted' => $ingredient['is_highlighted'] ?? false,
+                    ];
                 }
-            } else {
-                session()->put('t-error', 'Please select at least one image and maximum 3 images');
+
+                $section->ingredients()->createMany($ingredients);
             }
 
-            session()->put('t-success', 'post created successfully');
-        } catch (Exception $e) {
+            // Save Instructions
+            foreach ($request->instructions as $instructionIndex => $instructionData) {
+                $instructionImagePath = null;
+                if (isset($instructionData['image_url']) && is_file($instructionData['image_url'])) {
+                    $instructionImagePath = Helper::fileUpload($instructionData['image_url'], 'instructions', 'instruction_' . Str::random(10));
+                } elseif ($request->hasFile("instructions.$instructionIndex.image_url")) {
+                    $file = $request->file("instructions.$instructionIndex.image_url");
+                    $instructionImagePath = Helper::fileUpload($file, 'instructions', 'instruction_' . Str::random(10));
+                }
 
-            session()->put('t-error', $e->getMessage());
-        }
+                $recipe->instructions()->create([
+                    'title' => $instructionData['title'],
+                    'step_number' => $instructionData['step_number'],
+                    'description' => $instructionData['description'],
+                    'image_url' => $instructionImagePath,
+                ]);
+            }
 
-        return redirect()->route('admin.recipe.index')->with('t-success', 'post created successfully');
+            // DB::commit();
+
+            return redirect()->route('admin.recipe.index')->with('t-success', 'Recipe created successfully.');
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     return redirect()->back()->with('t-error', 'Error: ' . $e->getMessage())->withInput();
+        // }
     }
+
 
     /**
      * Display the specified resource.

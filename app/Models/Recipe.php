@@ -9,11 +9,9 @@ class Recipe extends Model
     protected $guarded = ['id'];
 
 
-    public function ingredients()
+    public function ingredientSections()
     {
-        return $this->belongsToMany(Ingredient::class, 'recipe_ingredients')
-            ->withPivot('quantity', 'unit')  
-            ->withTimestamps();
+        return $this->hasMany(IngredientSection::class);
     }
 
 
