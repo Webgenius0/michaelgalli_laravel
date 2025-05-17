@@ -20,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Crypt;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 
@@ -68,19 +69,22 @@ class RecipeController extends Controller
                 })
 
                 ->addColumn('action', function ($data) {
+                    $encryptedId = Crypt::encryptString($data->id);
+
                     return '<div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
 
-                                <a href="#" type="button" onclick="goToEdit(' . $data->id . ')" class="btn btn-primary fs-14 text-white delete-icn" title="Delete">
+                                <a href="#" type="button" onclick="goToEdit(`' . $encryptedId . '`)" class="btn btn-primary fs-14 text-white" title="Edit">
                                     <i class="fe fe-edit"></i>
                                 </a>
 
-                                <a href="#" type="button" onclick="goToOpen(' . $data->id . ')" class="btn btn-success fs-14 text-white delete-icn" title="Delete">
+                                <a href="#" type="button" onclick="goToOpen(`' . $encryptedId . '`)" class="btn btn-success fs-14 text-white" title="View">
                                     <i class="fe fe-eye"></i>
                                 </a>
 
-                                <a href="#" type="button" onclick="showDeleteConfirm(' . $data->id . ')" class="btn btn-danger fs-14 text-white delete-icn" title="Delete">
+                                <a href="#" type="button" onclick="showDeleteConfirm(`' . $encryptedId . '`)" class="btn btn-danger fs-14 text-white" title="Delete">
                                     <i class="fe fe-trash"></i>
                                 </a>
+
                             </div>';
                 })
                 ->rawColumns(['title', 'image_url', 'short_description', 'ingredients', 'action'])
@@ -237,12 +241,24 @@ class RecipeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show($encryptedId)
     {
+
+
+        $id = Crypt::decryptString($encryptedId);
+
+
         $recipe = Recipe::with([
             'ingredientSections.ingredients',
+            'protein',
+            'calory',
+            'carb',
+            'cuisine',
+            'time_to_clock',
+            'health_goal',
             'instructions' => fn($q) => $q->orderBy('step_number')
         ])->findOrFail($id);
+
 
 
         return view('backend.layouts.recipe.show', compact('recipe'));
@@ -251,120 +267,215 @@ class RecipeController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(post $post, $id)
+    public function edit($encryptedId)
     {
-        $post = Post::findOrFail($id);
-        $categories = Category::where('status', 'active')->get();
-        $subcategories = Subcategory::where('status', 'active')->get();
-        return view('backend.layouts.recipe.edit', compact('post', 'categories', 'subcategories'));
+        $id = Crypt::decryptString($encryptedId);
+
+
+        $recipe = Recipe::with([
+            'ingredientSections.ingredients',
+            'instructions',
+        ])->findOrFail($id);
+
+
+
+        $proteins = Protein::all();
+        $calories = Calories::all();
+        $carbs = Carb::all();
+        $cuisines = Cuisine::all();
+        $health_goals = HealthGoal::all();
+        $time_to_cooks = TimeToClock::all();
+
+        return view('backend.layouts.recipe.edit', compact(
+            'recipe',
+            'proteins',
+            'calories',
+            'carbs',
+            'cuisines',
+            'health_goals',
+            'time_to_cooks',
+            'encryptedId'
+        ));
     }
+
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $encryptedId)
     {
-        $validator = Validator::make($request->all(), [
-            'title'             => 'required|max:250',
-            'content'           => 'required|string',
-            'thumbnail'         => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'category_id'       => 'required|exists:categories,id',
-            'subcategory_id'    => 'required|exists:subcategories,id',
-            'images'            => 'nullable|array|max:3',
-            'images.*'          => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
+        $id = Crypt::decryptString($encryptedId);
+
+        $rules = [
+            'title' => 'required|string|max:255',
+            'short_description' => 'nullable|string',
+            'long_description' => 'nullable|string',
+            'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+
+            'protein_id' => 'nullable|exists:proteins,id',
+            'calory_id' => 'nullable|exists:calories,id',
+            'carb_id' => 'nullable|exists:carbs,id',
+            'cuisine_id' => 'nullable|exists:cuisines,id',
+            'health_goal_id' => 'nullable|exists:health_goals,id',
+            'time_to_clock_id' => 'nullable|exists:time_to_clocks,id',
+
+            'sections' => 'required|array',
+            'sections.*.title' => 'required|string|max:255',
+            'sections.*.order' => 'required|integer',
+            'sections.*.ingredients' => 'required|array',
+            'sections.*.ingredients.*.name' => 'required|string|max:255',
+            'sections.*.ingredients.*.amount' => 'required|string|max:255',
+            'sections.*.ingredients.*.is_highlighted' => 'nullable|boolean',
+
+            'instructions' => 'required|array|min:1',
+            'instructions.*.title' => 'required|string|max:255',
+            'instructions.*.step_number' => 'required|integer|min:1',
+            'instructions.*.description' => 'required|string',
+            'instructions.*.image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
         try {
-            $data = $validator->validated();
+            DB::beginTransaction();
 
-            $post = Post::findOrFail($id);
+            $recipe = Recipe::findOrFail($id);
 
-            if ($request->hasFile('thumbnail')) {
-                $validate['thumbnail'] = Helper::fileUpload($request->file('thumbnail'), 'post', time() . '_' . getFileName($request->file('thumbnail')));
-            }
-
-            $post->title = $data['title'];
-            $post->thumbnail = $data['thumbnail'] ?? $post->thumbnail;
-            $post->content = $data['content'];
-            $post->category_id = $data['category_id'];
-            $post->subcategory_id = $data['subcategory_id'];
-            $post->save();
-
-            $image_count = Image::where('post_id', $post->id)->count();
-            $new_images_count = $request->has('images') ? count($request['images']) : 0;
-
-            if (($image_count + $new_images_count) > 3) {
-                session()->put('t-error', 'Please select at most 3 images');
-            } else {
-                if ($new_images_count > 0) {
-                    foreach ($request->file('images') as $image) {
-                        $imageName = 'images_' . Str::random(10);
-                        $uploadedImagePath = Helper::fileUpload($image, 'post', $imageName);
-                        Image::create(['post_id' => $post->id, 'path' => $uploadedImagePath]);
-                    }
+            // Handle main image upload if exists
+            if ($request->hasFile('image_url')) {
+                // Delete old image
+                if ($recipe->image_url && file_exists(public_path($recipe->image_url))) {
+                    unlink(public_path($recipe->image_url));
                 }
+                $thumbnailPath = Helper::fileUpload($request->file('image_url'), 'recipes', 'thumbnail_' . Str::random(10));
+                $recipe->image_url = $thumbnailPath;
             }
 
-            session()->put('t-success', 'post updated successfully');
-        } catch (Exception $e) {
+            // Update recipe main info
+            $recipe->title = $request->title;
+            $recipe->short_description = $request->short_description;
+            $recipe->long_description = $request->long_description;
+            $recipe->protein_id = $request->protein_id;
+            $recipe->calories_id = $request->calory_id;
+            $recipe->carb_id = $request->carb_id;
+            $recipe->cuisine_id = $request->cuisine_id;
+            $recipe->health_goal_id = $request->health_goal_id;
+            $recipe->time_to_clock_id = $request->time_to_clock_id;
+            $recipe->save();
 
-            session()->put('t-error', $e->getMessage());
+            // Delete existing ingredient sections and ingredients, then recreate to simplify
+            $recipe->ingredientSections()->each(function ($section) {
+                $section->ingredients()->delete();
+                $section->delete();
+            });
+
+            foreach ($request->sections as $sectionData) {
+                $section = $recipe->ingredientSections()->create([
+                    'title' => $sectionData['title'],
+                    'order' => $sectionData['order'],
+                ]);
+
+                $ingredients = [];
+                foreach ($sectionData['ingredients'] as $ingredient) {
+                    $ingredients[] = [
+                        'name' => $ingredient['name'],
+                        'amount' => $ingredient['amount'],
+                        'is_highlighted' => $ingredient['is_highlighted'] ?? false,
+                    ];
+                }
+                $section->ingredients()->createMany($ingredients);
+            }
+
+            // Delete existing instructions, then recreate
+            $recipe->instructions()->delete();
+
+            foreach ($request->instructions as $instructionIndex => $instructionData) {
+                $instructionImagePath = null;
+
+                if ($request->hasFile("instructions.$instructionIndex.image_url")) {
+                    $file = $request->file("instructions.$instructionIndex.image_url");
+                    $instructionImagePath = Helper::fileUpload($file, 'instructions', 'instruction_' . Str::random(10));
+                }
+
+                $recipe->instructions()->create([
+                    'title' => $instructionData['title'],
+                    'step_number' => $instructionData['step_number'],
+                    'description' => $instructionData['description'],
+                    'image_url' => $instructionImagePath,
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('admin.recipe.index')->with('t-success', 'Recipe updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('t-error', 'Error: ' . $e->getMessage())->withInput();
         }
-
-        return redirect()->route('admin.recipe.edit', $post->id)->with('t-success', 'post updated successfully');
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $encryptedId)
     {
         try {
+            $id = Crypt::decryptString($encryptedId);
 
-            $data = Post::findOrFail($id);
+            $recipe = Recipe::with(['ingredientSections.ingredients', 'instructions'])->findOrFail($id);
 
-            if ($data->thumbnail && file_exists(public_path($data->thumbnail))) {
-                Helper::fileDelete(public_path($data->thumbnail));
+            
+            if ($recipe->image_url && file_exists(public_path($recipe->image_url))) {
+                unlink(public_path($recipe->image_url));
             }
 
-            $images = Image::where('post_id', $data->id)->get();
-            if (count($images) > 0) {
-                foreach ($images as $image) {
-                    if ($image->path && file_exists(public_path($image->path))) {
-                        Helper::fileDelete(public_path($image->path));
-                    }
-                    $image->delete();
+            
+            foreach ($recipe->ingredientSections as $section) {
+                
+                $section->ingredients()->delete();
+                $section->delete();
+            }
+
+            
+            foreach ($recipe->instructions as $instruction) {
+                if ($instruction->image_url && file_exists(public_path($instruction->image_url))) {
+                    unlink(public_path($instruction->image_url));
                 }
+                $instruction->delete();
             }
 
-            $data->delete();
+            
+            $recipe->delete();
+
             return response()->json([
                 'status' => 't-success',
-                'message' => 'Your action was successful!'
+                'message' => 'Recipe deleted successfully!',
             ]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => 't-error',
-                'message' => 'Your action was successful!'
-            ]);
+                'message' => 'Delete failed: ' . $e->getMessage(),
+            ], 500);
         }
     }
 
+
     public function status(int $id): JsonResponse
     {
-        $data = Post::findOrFail($id);
+        $data = Recipe::findOrFail($id);
         if (!$data) {
             return response()->json([
                 'status' => 't-error',
                 'message' => 'Item not found.',
             ]);
         }
-        $data->status = $data->status === 'active' ? 'inactive' : 'active';
-        $data->save();
+        $data->delete();
+
         return response()->json([
             'status' => 't-success',
             'message' => 'Your action was successful!',

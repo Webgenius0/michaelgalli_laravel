@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\Frontend\HomeController;
 use App\Http\Controllers\Api\Frontend\ImageController;
 use App\Http\Controllers\Api\Frontend\PostController;
 use App\Http\Controllers\Api\Frontend\QuestionController;
+use App\Http\Controllers\Api\Frontend\RecipeManageController;
 use App\Http\Controllers\Api\Frontend\SubcategoryController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\Frontend\SettingsController;
@@ -36,6 +37,10 @@ Route::post('subscriber/store',[SubscriberController::class, 'store'])->name('su
 
 
 Route::get('/question-list', [QuestionController::class, 'index']);
+
+
+Route::get('/recipe/list', [RecipeManageController::class, 'recipe_list']);
+Route::get('/recipe/details/{id}', [RecipeManageController::class, 'recipe_details']);
 
 
 

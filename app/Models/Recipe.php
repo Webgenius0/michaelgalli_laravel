@@ -17,8 +17,41 @@ class Recipe extends Model
 
     // instructions 
 
-    public function instructions(){
+    public function instructions()
+    {
         return $this->hasMany(RecipeInstruction::class);
     }
 
+
+    public function calory()
+    {
+        return $this->belongsTo(Calories::class, 'calories_id', 'id');
+    }
+
+
+    public function protein()
+    {
+        return $this->belongsTo(Protein::class, 'protein_id', 'id');
+    }
+
+
+    public function carb()
+    {
+        return $this->belongsTo(Carb::class, 'carb_id', 'id');
+    }
+
+    public function cuisine()
+    {
+        return $this->belongsTo(Cuisine::class, 'cuisine_id', 'id');
+    }
+
+    public function health_goal()
+    {
+        return $this->belongsTo(HealthGoal::class, 'health_goal_id', 'id');
+    }
+
+    public function time_to_clock()
+    {
+        return $this->belongsTo(TimeToClock::class, 'time_to_clock_id', 'id');
+    }
 }

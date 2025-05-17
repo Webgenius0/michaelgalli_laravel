@@ -30,22 +30,45 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                {{-- Title --}}
-                                <h1 class="text-4xl font-bold text-gray-900 mb-8">{{ $recipe->title }}</h1>
-                                <h1 class="text-4xl font-bold text-gray-900 mb-8">{{ "Description - " }}</h1>
 
 
-                                {{-- Short Description --}}
-                                @if ($recipe->short_description)
-                                    <p class="text-4xl font-bold text-gray-900 mb-8">{{ $recipe->short_description }}</p>
-                                @endif
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        {{-- Title --}}
+                                        <h1 class="text-4xl font-bold text-gray-900 mb-8">{{ $recipe->title }}</h1>
+                                        <h1 class="text-4xl font-bold text-gray-900 mb-8">{{ 'Description - ' }}</h1>
 
-                                {{-- Long Description --}}
-                                @if ($recipe->long_description)
-                                    <div class="text-4xl font-bold text-gray-900 mb-8">
-                                        {!! nl2br(e($recipe->long_description)) !!}
+                                        {{-- Short Description --}}
+                                        @if ($recipe->short_description)
+                                            <p class="text-4xl font-bold text-gray-900 mb-8">
+                                                {{ $recipe->short_description }}</p>
+                                        @endif
+
+                                        {{-- Long Description --}}
+                                        @if ($recipe->long_description)
+                                            <div class="text-4xl font-bold text-gray-900 mb-8">
+                                                {!! nl2br(e($recipe->long_description)) !!}
+                                            </div>
+                                        @endif
                                     </div>
-                                @endif
+                                    <div class="col-lg-6">
+                                        <p class="text-4xl font-bold text-gray-900 mb-8">
+                                          Protein :   {{ $recipe->protein->name  ?? null }}, <br>
+                                          Carb :   {{ $recipe->carb->name ?? null  }}, <br>
+                                          Cuisine  :   {{ $recipe->cuisine->name ?? null  }}, <br>
+                                          Health Goal  :   {{ $recipe->health_goal->name ?? null }}, <br>
+
+                                          Calory :   {{ $recipe->calory->name ?? null  }}, <br> <br>
+
+                                          Time to Cook : {{ $recipe->time_to_clock->name ?? null }}
+
+                                        
+                                        </p> 
+
+                                       
+                                        
+                                    </div>
+                                </div>
 
                                 {{-- INGREDIENTS --}}
                                 <div class="mb-12">
@@ -105,8 +128,7 @@
                                                     </div>
                                                     @if ($step->image_url)
                                                         <div class="ml-4">
-                                                            <img src="{{  $step->image_url }}"
-                                                                alt="Step Image"
+                                                            <img src="{{ $step->image_url }}" alt="Step Image"
                                                                 class="w-25 h-24 object-cover rounded-md shadow-md border">
                                                         </div>
                                                     @endif
