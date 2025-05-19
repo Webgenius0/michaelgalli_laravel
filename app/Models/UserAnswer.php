@@ -12,6 +12,7 @@ class UserAnswer extends Model
         'question_id',
         'answer_text',
         'selected_option_value',
+        'user_family_member_id'
     ];
 
     public function user()

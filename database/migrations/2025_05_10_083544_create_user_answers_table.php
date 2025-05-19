@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('user_answers', function (Blueprint $table) {
             $table->id();
+            
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // assumes you have a users table
+            $table->foreignId('user_family_member_id')->nullable()->constrained()->onDelete('cascade'); // optional, if family member is involved
             $table->foreignId('quiz_id')->constrained()->onDelete('cascade');
             $table->foreignId('question_id')->constrained()->onDelete('cascade');
 

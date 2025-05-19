@@ -20,7 +20,7 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\Frontend\SettingsController;
 use App\Http\Controllers\Api\Frontend\SocialLinksController;
 use App\Http\Controllers\Api\Frontend\SubscriberController;
-
+use App\Http\Controllers\Api\Frontend\UserFamilyMemberController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -112,6 +112,19 @@ Route::middleware(['auth:api'])->controller(FirebaseTokenController::class)->pre
 
 Route::middleware(['auth:api'])->controller(QuestionController::class)->prefix('question')->group(function () {
         Route::post('/store', 'store');
+});
+
+
+// user family member
+Route::middleware(['auth:api'])->controller(UserFamilyMemberController::class)->prefix('user/family')->group(function () {
+    Route::get('/list', 'familyList');
+    Route::post('/store', 'familyStore');
+    Route::get('/edit/{id}', 'familyEdit');
+    Route::post('/update/{id}', 'familyUpdate');
+    Route::delete('/delete/{id}', 'familyDelete');
+
+    // quiz
+    Route::post('/quiz/store', 'quizStore');
 });
 
 
