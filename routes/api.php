@@ -36,7 +36,7 @@ Route::get('/faq', [FaqController::class, 'index']);
 Route::post('subscriber/store',[SubscriberController::class, 'store'])->name('subscriber.store');
 
 
-Route::get('/question-list', [QuestionController::class, 'index']);
+Route::get('/question/list', [QuestionController::class, 'index']);
 
 
 Route::get('/recipe/list', [RecipeManageController::class, 'recipe_list']);
