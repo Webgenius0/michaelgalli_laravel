@@ -40,7 +40,10 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'otp',
         'otp_expires_at',
-        'last_activity_at'
+        'last_activity_at',
+        'age',
+        'height',
+        'weight',
     ];
 
     /**
@@ -137,6 +140,11 @@ class User extends Authenticatable implements JWTSubject
     public function familyMembers()
     {
         return $this->hasMany(UserFamilyMember::class, 'user_id', 'id');
+    }
+
+    public function deliveryAddresses()
+    {
+        return $this->hasMany(DeliveryAddress::class, 'user_id', 'id');
     }
     
 }

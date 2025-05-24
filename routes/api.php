@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Auth\SocialLoginController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\FirebaseTokenController;
 use App\Http\Controllers\Api\Frontend\categoryController;
+use App\Http\Controllers\Api\Frontend\DeliveryAddressController;
 use App\Http\Controllers\Api\Frontend\FaqController;
 use App\Http\Controllers\Api\Frontend\HomeController;
 use App\Http\Controllers\Api\Frontend\ImageController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\Api\Frontend\SettingsController;
 use App\Http\Controllers\Api\Frontend\SocialLinksController;
 use App\Http\Controllers\Api\Frontend\SubscriberController;
 use App\Http\Controllers\Api\Frontend\UserFamilyMemberController;
+use App\Http\Controllers\Api\Frontend\UserProfileController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -113,6 +115,19 @@ Route::middleware(['auth:api'])->controller(FirebaseTokenController::class)->pre
 Route::middleware(['auth:api'])->controller(QuestionController::class)->prefix('question')->group(function () {
         Route::post('/store', 'store');
 });
+
+
+Route::middleware(['auth:api'])->controller(DeliveryAddressController::class)->prefix('delivery/address')->group(function () {
+    Route::get('/list', 'index');
+    Route::post('/store', 'store');
+});
+
+
+Route::middleware(['auth:api'])->controller(UserProfileController::class)->prefix('user/profile')->group(function () {
+    Route::get('/list', 'index');
+    Route::post('/update', 'update');
+});
+
 
 
 // user family member
