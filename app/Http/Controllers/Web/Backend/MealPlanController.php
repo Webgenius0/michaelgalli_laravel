@@ -25,13 +25,11 @@ class MealPlanController extends Controller
         if ($request->ajax()) {
 
 
+            // meal plans
             $data = MealPlan::latest()->get();
-
             return DataTables::of($data)
 
                 ->addIndexColumn()
-
-
                 ->addColumn('action', function ($data) {
                     $encryptedId = Crypt::encryptString($data->id);
 
