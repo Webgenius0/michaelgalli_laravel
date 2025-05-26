@@ -8,7 +8,7 @@ use App\Http\Controllers\Web\NotificationController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/',[HomeController::class, 'create'])->name('home');
+Route::get('/',[HomeController::class, 'index'])->name('home');
 
 Route::get('/post',[HomeController::class, 'index'])->name('post.index');
 Route::get('/post/show/{slug}',[HomeController::class, 'post'])->name('post.show');
