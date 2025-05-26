@@ -116,13 +116,14 @@ Route::middleware(['auth:api'])->controller(QuestionController::class)->prefix('
         Route::post('/store', 'store');
 });
 
-
+// Delivery Address
 Route::middleware(['auth:api'])->controller(DeliveryAddressController::class)->prefix('delivery/address')->group(function () {
     Route::get('/list', 'index');
     Route::post('/store', 'store');
 });
 
 
+// user profile
 Route::middleware(['auth:api'])->controller(UserProfileController::class)->prefix('user/profile')->group(function () {
     Route::get('/list', 'index');
     Route::post('/update', 'update');
