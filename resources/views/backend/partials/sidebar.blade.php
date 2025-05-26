@@ -156,21 +156,21 @@
                         <span class="side-menu__label">Contact</span>
                     </a>
                 </li>
-                <li class="slide">
+                {{-- <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('subscriber') ? 'has-link' : '' }}"
                         href="{{ route('admin.subscriber.index') }}">
                         <i class="fa-solid fa-people-group side-menu__icon"></i>
                         <span class="side-menu__label">Subscriber</span>
                     </a>
-                </li>
-                <li class="slide">
+                </li> --}}
+                {{-- <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('admin.chat') ? 'has-link' : '' }}"
                         href="{{ route('admin.chat.index') }}">
                         <i class="fa-brands fa-rocketchat side-menu__icon"></i>
                         <span class="side-menu__label">Chat</span>
                     </a>
-                </li>
-                <li class="slide">
+                </li> --}}
+                {{-- <li class="slide">
                     <a class="side-menu__item" data-bs-toggle="slide" href="#">
                         <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 512 512"
                             fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -186,7 +186,7 @@
                         <li><a href="{{ route('admin.roles.index') }}" class="slide-item">Roll</a></li>
                         <li><a href="{{ route('admin.permissions.index') }}" class="slide-item">Permission</a></li>
                     </ul>
-                </li>
+                </li> --}}
                 <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('setting') ? 'has-link' : '' }}"
                         data-bs-toggle="slide" href="#">
