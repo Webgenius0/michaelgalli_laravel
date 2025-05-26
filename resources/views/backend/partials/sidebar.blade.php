@@ -38,7 +38,7 @@
 
 
                  <li class="slide">
-                    <a class="side-menu__item {{ request()->routeIs('admin.meal_plan') ? 'has-link' : '' }}"
+                    <a class="side-menu__item {{ request()->routeIs('admin.meal_plan.*') ? 'active' : '' }}"
                         href="{{ route('admin.meal_plan.index') }}">
 
 
@@ -58,7 +58,7 @@
 
 
                 @php
-                    $isRecipeActive = request()->routeIs('admin.protein.*','admin.time_to_clock.*', 'admin.cuisine.*','admin.health_goal.*', 'admin.calories.*', 'admin.carb.*');
+                    $isRecipeActive = request()->routeIs('admin.category.*','admin.protein.*','admin.time_to_clock.*', 'admin.cuisine.*','admin.health_goal.*', 'admin.calories.*', 'admin.carb.*', 'admin.recipe.*');
                 @endphp
 
                 <li class="slide {{ $isRecipeActive ? 'is-expanded' : '' }}">
