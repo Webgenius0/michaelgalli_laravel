@@ -34,7 +34,7 @@ use App\Http\Controllers\Web\Backend\SubcategoryController;
 use App\Http\Controllers\Web\Backend\SubscriberController;
 use App\Http\Controllers\Web\Backend\TimeToClockController;
 
-Route::get("dashboard", [DashboardController::class, 'index'])->name('dashboard');
+Route::get("admin_dashboard", [DashboardController::class, 'index'])->name('dashboard');
 
 
 /*
