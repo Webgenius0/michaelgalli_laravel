@@ -28,25 +28,13 @@ class UserSeeder extends Seeder
             ]);
 
             DB::table('roles')->insert([
-                ['id' => 1, 'name' => 'developer', 'guard_name' => 'web'],
+               
                 ['id' => 2, 'name' => 'admin', 'guard_name' => 'web'],
-                ['id' => 3, 'name' => 'retailer', 'guard_name' => 'api'],
-                ['id' => 4, 'name' => 'customer', 'guard_name' => 'api'],
+                
             ]);
 
             DB::table('users')->insert([
-                [
-                    'id' => 1,
-                    'first_name' => 'Developer',
-                    'last_name' => '',
-                    'email' => 'developer@developer.com',
-                    'phone_number' => '1111111111',
-                    'password' => Hash::make('12345678'),
-                    'otp_verified_at' => Carbon::now(),
-                    'status' => 'active',
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ],
+                
                 [
                     'id' => 2,
                     'first_name' => 'Admin',
@@ -59,30 +47,8 @@ class UserSeeder extends Seeder
                     'created_at' => now(),
                     'updated_at' => now(),
                 ],
-                [
-                    'id' => 3,
-                    'first_name' => 'Retailer',
-                    'last_name' => '',
-                    'email' => 'retailer@retailer.com',
-                    'phone_number' => '3333333333',
-                    'password' => Hash::make('12345678'),
-                    'otp_verified_at' => Carbon::now(),
-                    'status' => 'active',
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ],
-                [
-                    'id' => 4,
-                    'first_name' => 'Customer',
-                    'last_name' => '',
-                    'email' => 'customer@customer.com',
-                    'phone_number' => '4444444444',
-                    'password' => Hash::make('12345678'),
-                    'otp_verified_at' => Carbon::now(),
-                    'status' => 'active',
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ],
+                
+                
             ]);
 
 
