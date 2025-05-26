@@ -12,11 +12,16 @@ use function Symfony\Component\String\b;
 
 class HomeController extends Controller
 {
-    // 
-    
-    public function create()
+    public function index()
     {
-        return view('auth.login');
+        $cms = [
+            'home' => CMS::where('page', PageEnum::HOME)->where('status', 'active')->get(),
+            'common' => CMS::where('page', PageEnum::COMMON)->where('status', 'active')->get(),
+        ];
+        
+        $posts = Post::where('status', 'active')->paginate(9);
+
+        return view('frontend.layouts.index', compact('cms', 'posts'));
     }
 
     public function post($slug){

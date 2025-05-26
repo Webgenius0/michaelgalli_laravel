@@ -1,4 +1,4 @@
-@php
+{{-- @php
 use \Illuminate\Support\Str;
 use App\Enums\PageEnum;
 use App\Enums\SectionEnum;
@@ -365,4 +365,4 @@ $cms_banners = $cms['home']->where('section', SectionEnum::HOME_BANNERS)->values
     </div>
     <!-- CONTAINER CLOSED -->
 </div>
-@endsection
+@endsection --}}
