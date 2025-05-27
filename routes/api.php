@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\Frontend\SettingsController;
 use App\Http\Controllers\Api\Frontend\SocialLinksController;
 use App\Http\Controllers\Api\Frontend\SubscriberController;
+use App\Http\Controllers\Api\Frontend\SubscriptionController;
 use App\Http\Controllers\Api\Frontend\UserFamilyMemberController;
 use App\Http\Controllers\Api\Frontend\UserProfileController;
 use Illuminate\Support\Facades\Route;
@@ -35,7 +36,7 @@ Route::get('/subcategory', [SubcategoryController::class, 'index']);
 Route::get('/social/links', [SocialLinksController::class, 'index']);
 Route::get('/settings', [SettingsController::class, 'index']);
 Route::get('/faq', [FaqController::class, 'index']);
-Route::post('subscriber/store',[SubscriberController::class, 'store'])->name('subscriber.store');
+Route::post('subscriber/store', [SubscriberController::class, 'store'])->name('subscriber.store');
 
 
 Route::get('/question/list', [QuestionController::class, 'index']);
@@ -43,6 +44,9 @@ Route::get('/question/list', [QuestionController::class, 'index']);
 
 Route::get('/recipe/list', [RecipeManageController::class, 'recipe_list']);
 Route::get('/recipe/details/{id}', [RecipeManageController::class, 'recipe_details']);
+
+
+
 
 
 
@@ -113,7 +117,7 @@ Route::middleware(['auth:api'])->controller(FirebaseTokenController::class)->pre
 
 
 Route::middleware(['auth:api'])->controller(QuestionController::class)->prefix('question')->group(function () {
-        Route::post('/store', 'store');
+    Route::post('/store', 'store');
 });
 
 // Delivery Address
@@ -142,6 +146,18 @@ Route::middleware(['auth:api'])->controller(UserFamilyMemberController::class)->
     // quiz
     Route::post('/quiz/store', 'quizStore');
 });
+
+
+// subscribe
+Route::middleware(['auth:api'])->controller(SubscriptionController::class)->prefix('subscriber')->group(function () {
+
+    // get meal plans
+    Route::get('/meal/plans', 'mealPlans');
+    Route::post('/subscribe', 'subscribe');
+});
+
+
+
 
 
 /*

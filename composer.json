@@ -11,6 +11,7 @@
         "biscolab/laravel-recaptcha": "^6.1",
         "kreait/laravel-firebase": "^5.8",
         "laravel/breeze": "^2.3",
+        "laravel/cashier": "^15.6",
         "laravel/framework": "^11.31",
         "laravel/reverb": "^1.0",
         "laravel/sanctum": "^4.0",
@@ -18,7 +19,7 @@
         "laravel/tinker": "^2.9",
         "propaganistas/laravel-phone": "^6.0",
         "spatie/laravel-permission": "^6.10",
-        "stripe/stripe-php": "^17.1",
+        "stripe/stripe-php": "^16.6",
         "tymon/jwt-auth": "^2.1",
         "yajra/laravel-datatables-oracle": "^11.0"
     },

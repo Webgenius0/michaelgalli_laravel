@@ -1,12 +1,15 @@
 <?php
 
+use App\Models\Subscription;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\Web\NotificationController;
+use App\Http\Controllers\Web\Frontend\HomeController;
 use App\Http\Controllers\Api\Auth\SocialLoginController;
 use App\Http\Controllers\Web\Frontend\ContactController;
-use App\Http\Controllers\Web\Frontend\HomeController;
 use App\Http\Controllers\Web\Frontend\SubscriberController;
-use App\Http\Controllers\Web\NotificationController;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Frontend\SubscriptionController;
+use App\Http\Controllers\Api\Frontend\StripeWebhookController;
 
 Route::get('/',[HomeController::class, 'create'])->name('home');
 
@@ -26,6 +29,23 @@ Route::controller(NotificationController::class)->prefix('notification')->name('
     Route::post('read/single/{id}', 'readSingle')->name('read.single');
     Route::POST('read/all', 'readAll')->name('read.all');
 })->middleware('auth');
+
+
+
+// payment success and cancel routes
+Route::get('/subscription/success/{user_id}',[SubscriptionController::class, 'success'])->name('subscription.success');
+Route::get('/subscription/cancel/{user_id}', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
+
+
+// stripe webhook route
+Route::post('/subscription/webhook/payment', [StripeWebhookController::class, '__invoke'])
+    ->name('stripe.webhook');
+
+
+
+
+
+
 
 // Routes for running artisan commands
 Route::get('/run-migrate-fresh', function () {

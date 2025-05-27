@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Web\Backend;
 use App\Models\Recipe;
 use App\Models\MealPlan;
 use App\Models\WeeklyRecipe;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 
