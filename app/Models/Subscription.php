@@ -10,6 +10,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Subscription extends Model
 {
+
+
+    protected $table = 'subscriptions';
+
+
+
     protected $fillable = [
         'user_id',
         'meal_plan_id',
