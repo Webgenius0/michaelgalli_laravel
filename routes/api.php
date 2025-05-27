@@ -154,6 +154,8 @@ Route::middleware(['auth:api'])->controller(SubscriptionController::class)->pref
     // get meal plans
     Route::get('/meal/plans', 'mealPlans');
     Route::post('/subscribe', 'subscribe');
+    // pause subscription
+    Route::post('/pause', 'pauseSubscription');
 });
 
 

@@ -13,7 +13,7 @@ use Laravel\Cashier\Exceptions\IncompletePayment;
 
 class SubscriptionController extends Controller
 {
-    
+
     // meal plan
     public function mealPlans()
     {
@@ -43,12 +43,11 @@ class SubscriptionController extends Controller
         ]);
 
         if ($validator->fails()) {
-           return response()->json([
+            return response()->json([
                 'status' => false,
                 'message' => $validator->errors()->first(),
                 'data' => [],
             ], 422);
-            
         }
 
         $meal_plan = MealPlan::find($request->meal_plan_id);
@@ -56,7 +55,7 @@ class SubscriptionController extends Controller
         // dd($meal_plan);
 
         if (!$meal_plan || !$meal_plan->stripe_price_id) {
-          return response()->json([
+            return response()->json([
                 'status' => false,
                 'message' => 'Meal plan not found or does not have a Stripe price ID.',
                 'data' => [],
@@ -107,8 +106,8 @@ class SubscriptionController extends Controller
             ],
         ], 200);
     }
-   
-    
+
+
 
 
     public function success($user_id)
@@ -129,6 +128,28 @@ class SubscriptionController extends Controller
             'message' => 'Subscription cancelled for user ID: ' . $user_id,
             'data' => [],
         ], 200);
+    }
+
+    // pause subscription
+    public function pauseSubscription(Request $request)
+    {
+        $user = auth('api')->user();
+        $subscription = $user->subscriptions()->where('status', 'active')->first();
+
+        if (!$subscription) {
+            return back()->with('error', 'No active subscription found.');
+        }
+
+        // Stripe API call to pause subscription
+        $stripeSub = $this->stripe->subscriptions->update($subscription->stripe_subscription_id, [
+            'pause_collection' => ['behavior' => 'keep_as_draft'],
+        ]);
+
+        // Update local DB
+        $subscription->status = 'paused';
+        $subscription->save();
+
+        return back()->with('success', 'Subscription paused successfully.');
     }
 
 
