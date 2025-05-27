@@ -40,6 +40,8 @@ class StripeWebhookController extends Controller
                 $user_id = $session->metadata->user_id ?? null;
 
                 $user = User::find($user_id);
+                $user->stripe_id = $session->customer;
+                $user->save();
 
                
                 // If the user is not found, you might want to create a new user or handle it accordingly
