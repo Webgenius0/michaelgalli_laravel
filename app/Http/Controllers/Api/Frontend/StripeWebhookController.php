@@ -116,7 +116,7 @@ class StripeWebhookController extends Controller
                             $order->recipes()->create([
                                 'recipe_id' => $recipe->id,
                                 'quantity' => 1, // Assuming quantity is always 1 for simplicity
-                                'price' => $mealPlan->price_per_recipe,
+                                'price' => $mealPlan->price_per_recipe ?? 0,
                                 'status' => 'completed',
                             ]);
                         }
