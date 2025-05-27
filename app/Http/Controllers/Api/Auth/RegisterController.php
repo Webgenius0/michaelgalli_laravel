@@ -75,7 +75,7 @@ class RegisterController extends Controller
             $otp = $user->otp;
             $email = $user->email;
 
-            Mail::to($email)->send(new RegisterOtpMail($otp, $user, 'Reset Your Password'));
+            // Mail::to($email)->send(new RegisterOtpMail($otp, $user, 'Reset Your Password'));
 
 
             $data = User::select($this->select)->with('roles')->find($user->id);
