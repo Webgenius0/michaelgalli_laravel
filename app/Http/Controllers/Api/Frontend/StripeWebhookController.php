@@ -110,8 +110,10 @@ class StripeWebhookController extends Controller
                         ]);
 
                         foreach ($recipes as $recipe) {
-                            $order->recipes()->attach($recipe->id, [
-                                'quantity' => 1,
+                           
+                            $order->recipes()->create([
+                                'recipe_id' => $recipe->id,
+                                'quantity' => 1, // Assuming quantity is always 1 for simplicity
                                 'price' => $mealPlan->price_per_recipe,
                                 'status' => 'completed',
                             ]);
