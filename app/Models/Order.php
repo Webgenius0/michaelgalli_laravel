@@ -25,8 +25,6 @@ class Order extends Model
 
     public function recipes()
     {
-        return $this->belongsToMany(Recipe::class, 'order_recipes')
-                    ->withPivot('quantity', 'price', 'status')
-                    ->withTimestamps();
+        return $this->hasMany(OrderRecipe::class, 'order_id');
     }
 }
