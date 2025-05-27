@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Frontend;
 
 use Stripe\Stripe;
 use App\Models\MealPlan;
+use Stripe\StripeClient;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Stripe\Checkout\Session;
@@ -13,6 +14,13 @@ use Laravel\Cashier\Exceptions\IncompletePayment;
 
 class SubscriptionController extends Controller
 {
+
+    protected $stripe;
+
+    public function __construct()
+    {
+        $this->stripe = new StripeClient(env('STRIPE_SECRET'));
+    }
 
     // meal plan
     public function mealPlans()
