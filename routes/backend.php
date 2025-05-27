@@ -1,38 +1,39 @@
 <?php
 
-use App\Http\Controllers\Web\Backend\Access\PermissionController;
-use App\Http\Controllers\Web\Backend\Access\RoleController;
-use App\Http\Controllers\Web\Backend\Access\UserController;
-use App\Http\Controllers\Web\Backend\CaloriesController;
-use App\Http\Controllers\Web\Backend\CarbController;
-use App\Http\Controllers\Web\Backend\CategoryController;
-use App\Http\Controllers\Web\Backend\ChatController;
-use App\Http\Controllers\Web\Backend\CMS\Web\Home\HomeBannerController;
-use App\Http\Controllers\Web\Backend\ContactController;
-use App\Http\Controllers\Web\Backend\CuisineController;
-use App\Http\Controllers\Web\Backend\Settings\FirebaseController;
-use App\Http\Controllers\Web\Backend\Settings\ProfileController;
-use App\Http\Controllers\Web\Backend\Settings\MailSettingController;
-use App\Http\Controllers\Web\Backend\Settings\SettingController;
-use App\Http\Controllers\Web\Backend\Settings\SocialController;
-use App\Http\Controllers\Web\Backend\Settings\StripeController;
-use App\Http\Controllers\Web\Backend\Settings\GoogleMapController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Web\Backend\DashboardController;
 use App\Http\Controllers\Web\Backend\FaqController;
-use App\Http\Controllers\Web\Backend\HealthGoalController;
-use App\Http\Controllers\Web\Backend\ImageController;
-use App\Http\Controllers\Web\Backend\MealPlanController;
+use App\Http\Controllers\Web\Backend\CarbController;
+use App\Http\Controllers\Web\Backend\ChatController;
 use App\Http\Controllers\Web\Backend\PageController;
 use App\Http\Controllers\Web\Backend\PostController;
-use App\Http\Controllers\Web\Backend\ProteinController;
+use App\Http\Controllers\Web\Backend\ImageController;
 use App\Http\Controllers\Web\Backend\RecipeController;
-use App\Http\Controllers\Web\Backend\Settings\CaptchaController;
-use App\Http\Controllers\Web\Backend\Settings\OtherController;
+use App\Http\Controllers\Web\Backend\ContactController;
+use App\Http\Controllers\Web\Backend\CuisineController;
+use App\Http\Controllers\Web\Backend\ProteinController;
+use App\Http\Controllers\Web\Backend\CaloriesController;
+use App\Http\Controllers\Web\Backend\CategoryController;
+use App\Http\Controllers\Web\Backend\MealPlanController;
+use App\Http\Controllers\Web\Backend\DashboardController;
+use App\Http\Controllers\Web\Backend\HealthGoalController;
 use App\Http\Controllers\Web\Backend\SocialLinkController;
-use App\Http\Controllers\Web\Backend\SubcategoryController;
 use App\Http\Controllers\Web\Backend\SubscriberController;
+use App\Http\Controllers\Web\Backend\Access\RoleController;
+use App\Http\Controllers\Web\Backend\Access\UserController;
+use App\Http\Controllers\Web\Backend\SubcategoryController;
 use App\Http\Controllers\Web\Backend\TimeToClockController;
+use App\Http\Controllers\Web\Backend\WeeklyRecipeController;
+use App\Http\Controllers\Web\Backend\Settings\OtherController;
+use App\Http\Controllers\Web\Backend\Settings\SocialController;
+use App\Http\Controllers\Web\Backend\Settings\StripeController;
+use App\Http\Controllers\Web\Backend\Settings\CaptchaController;
+use App\Http\Controllers\Web\Backend\Settings\ProfileController;
+use App\Http\Controllers\Web\Backend\Settings\SettingController;
+use App\Http\Controllers\Web\Backend\Access\PermissionController;
+use App\Http\Controllers\Web\Backend\Settings\FirebaseController;
+use App\Http\Controllers\Web\Backend\Settings\GoogleMapController;
+use App\Http\Controllers\Web\Backend\Settings\MailSettingController;
+use App\Http\Controllers\Web\Backend\CMS\Web\Home\HomeBannerController;
 
 Route::get("dashboard", [DashboardController::class, 'index'])->name('dashboard');
 
@@ -141,6 +142,17 @@ Route::controller(SubcategoryController::class)->prefix('subcategory')->name('su
 });
 
 Route::controller(RecipeController::class)->prefix('recipe')->name('recipe.')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('/create', 'create')->name('create');
+    Route::post('/store', 'store')->name('store');
+    Route::get('/show/{id}', 'show')->name('show');
+    Route::get('/edit/{id}', 'edit')->name('edit');
+    Route::post('/update/{id}', 'update')->name('update');
+    Route::delete('/delete/{id}', 'destroy')->name('destroy');
+    Route::get('/status/{id}', 'status')->name('status');
+});
+
+Route::controller(WeeklyRecipeController::class)->prefix('weekly-recipe')->name('weekly_recipe.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::get('/create', 'create')->name('create');
     Route::post('/store', 'store')->name('store');

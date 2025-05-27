@@ -3,52 +3,42 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use App\Models\MealPlan;
 
 class MealPlanSeeder extends Seeder
 {
     public function run()
     {
-        $plans = [
-            [
-                'name' => 'Plan for 1 Person - 3 Recipes',
-                'people' => 1,
-                'recipes_per_week' => 3,
-                'price_per_serving' => 50,  // AED per serving
-                'stripe_price_id' => 'price_1Person_3Recipes', // your Stripe price id here
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'Plan for 2 People - 4 Recipes',
-                'people' => 2,
-                'recipes_per_week' => 4,
-                'price_per_serving' => 48,
-                'stripe_price_id' => 'price_2People_4Recipes',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'Plan for 3 People - 5 Recipes',
-                'people' => 3,
-                'recipes_per_week' => 5,
-                'price_per_serving' => 47,
-                'stripe_price_id' => 'price_3People_5Recipes',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'Plan for 4 People - 5 Recipes',
-                'people' => 4,
-                'recipes_per_week' => 5,
-                'price_per_serving' => 46,
-                'stripe_price_id' => 'price_4People_5Recipes',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ];
+        MealPlan::create([
+            'name' => '2 People, 3 Recipes',
+            'people' => 2,
+            'recipes_per_week' => 3,
+            'price_per_serving' => 48.00,
+            'stripe_price_id' => 'price_1RTGJpB1kC1m7lm1BudbhcaH', // Replace with real ID
+        ]);
 
-        DB::table('meal_plans')->insert($plans);
+        MealPlan::create([
+            'name' => '2 People, 5 Recipes',
+            'people' => 2,
+            'recipes_per_week' => 5,
+            'price_per_serving' => 45.00,
+            'stripe_price_id' => 'price_1RTGKPB1kC1m7lm1WW7vjOfz', // Replace with real ID
+        ]);
+
+        MealPlan::create([
+            'name' => '4 People, 3 Recipes',
+            'people' => 4,
+            'recipes_per_week' => 3,
+            'price_per_serving' => 44.00,
+            'stripe_price_id' => 'price_1RTGL3B1kC1m7lm1YWcgcCPx', // Replace with real ID
+        ]);
+
+        MealPlan::create([
+            'name' => '4 People, 5 Recipes',
+            'people' => 4,
+            'recipes_per_week' => 5,
+            'price_per_serving' => 42.00,
+            'stripe_price_id' => 'price_1RTGMCB1kC1m7lm1CSuz5LgA', // Replace with real ID
+        ]);
     }
 }

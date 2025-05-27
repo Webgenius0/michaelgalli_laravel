@@ -146,6 +146,22 @@
                         <span class="side-menu__label">Recipe manage</span>
                     </a>
                 </li>
+
+
+                 {{-- <li class="slide">
+                    <a class="side-menu__item {{ request()->routeIs('weekly_recipe') ? 'has-link' : '' }}"
+                        href="{{ route('admin.weekly_recipe.create') }}">
+                        <i class="fa-solid fa-calendar-week side-menu__icon"></i>
+                        <span class="side-menu__label">Weekly Recipe</span>
+                    </a>
+                </li> --}}
+
+
+
+
+
+
+
                 <li>
                     <h3>Components</h3>
                 </li>
