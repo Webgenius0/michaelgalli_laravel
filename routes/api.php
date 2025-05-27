@@ -156,6 +156,8 @@ Route::middleware(['auth:api'])->controller(SubscriptionController::class)->pref
     Route::post('/subscribe', 'subscribe');
     // pause subscription
     Route::post('/pause', 'pauseSubscription');
+    // cancel subscription
+    Route::post('/cancel', 'cancelSubscription');
 });
 
 

@@ -142,10 +142,14 @@ class SubscriptionController extends Controller
     public function pauseSubscription(Request $request)
     {
         $user = auth('api')->user();
-        $subscription = $user->subscriptions()->where('status', 'active')->first();
+        $subscription = $user->subscriptions()->where('stripe_status', 'active')->first();
 
         if (!$subscription) {
-            return back()->with('error', 'No active subscription found.');
+            return response()->json([
+                'status' => false,
+                'message' => 'No active subscription found.',
+                'data' => [],
+            ], 404);
         }
 
         // Stripe API call to pause subscription
@@ -154,10 +158,47 @@ class SubscriptionController extends Controller
         ]);
 
         // Update local DB
-        $subscription->status = 'paused';
+        $subscription->stripe_status = 'paused';
         $subscription->save();
 
-        return back()->with('success', 'Subscription paused successfully.');
+
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Subscription paused successfully.',
+            'data' => $stripeSub,
+        ], 200);
+    }
+
+    // cancel subscription
+    public function cancelSubscription(Request $request)
+    {
+        $user = auth('api')->user();
+        $subscription = $user->subscriptions()->where('stripe_status', 'active')->first();
+
+        if (!$subscription) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No active subscription found.',
+                'data' => [],
+            ], 404);
+        }
+
+        // Stripe API call to cancel subscription
+        $stripeSub = $this->stripe->subscriptions->cancel($subscription->stripe_subscription_id);
+
+        // Update local DB
+        $subscription->stripe_status = 'canceled';
+        $subscription->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Subscription cancelled successfully.',
+            'data' => $stripeSub,
+        ], 200);
+
+
+        
     }
 
 
