@@ -37,9 +37,27 @@ class StripeWebhookController extends Controller
                 $session = $event->data->object;
                 $user = User::where('email', $session->customer_email)->first();
 
+                // If the user is not found, you might want to create a new user or handle it accordingly
+                if (!$user) {
+                    Log::warning('User not found for email: ' . $session->customer_email);
+                    return response('User not found.', 404);
+                }
+
                 if ($user) {
                     $stripe = new StripeClient(config('services.stripe.secret'));
                     $subscription = $stripe->subscriptions->retrieve($session->subscription);
+
+                    // log the subscription details
+                    Log::info('Stripe Subscription Details: ', [
+                        'id' => $subscription->id,
+                        'status' => $subscription->status,
+                        'price_id' => $subscription->items->data[0]->price->id ?? null,
+                        'quantity' => $subscription->items->data[0]->quantity ?? 1,
+                        'trial_end' => $subscription->trial_end,
+                        'current_period_end' => $subscription->current_period_end,
+                    ]);
+
+
 
                     Subscription::updateOrCreate(
                         ['stripe_subscription_id' => $subscription->id],
