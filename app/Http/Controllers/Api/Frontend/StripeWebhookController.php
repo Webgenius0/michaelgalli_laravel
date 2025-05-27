@@ -102,6 +102,8 @@ class StripeWebhookController extends Controller
                             ->take($mealPlan->recipes_per_week)
                             ->get();
 
+                        Log::info("Creating weekly order for user ID: {$recipes} with meal plan ID: {$mealPlan->id}");
+
                         $order = $user->orders()->create([
                             'week_start' => $weekStart,
                             'status' => 'completed',
