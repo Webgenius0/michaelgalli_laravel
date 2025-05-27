@@ -35,8 +35,13 @@ class StripeWebhookController extends Controller
         switch ($event->type) {
             case 'checkout.session.completed':
                 $session = $event->data->object;
-                $user = User::where('email', $session->customer_email)->first();
 
+                // update user stripe id
+                $user_id = $session->metadata->user_id ?? null;
+
+                $user = User::find($user_id);
+
+               
                 // If the user is not found, you might want to create a new user or handle it accordingly
                 if (!$user) {
                     Log::warning('User not found for email: ' . $session->customer_email);
