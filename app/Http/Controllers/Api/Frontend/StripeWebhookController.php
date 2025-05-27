@@ -4,16 +4,17 @@
 namespace App\Http\Controllers\Api\Frontend;
 
 use Stripe\Webhook;
-use Stripe\StripeClient;
 use App\Models\User;
 use App\Models\Order;
-use App\Models\Subscription;
+use App\Models\Recipe;
 use App\Models\MealPlan;
+use Stripe\StripeClient;
+use App\Models\Subscription;
 use App\Models\WeeklyRecipe;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 
 class StripeWebhookController extends Controller
 {
@@ -93,18 +94,28 @@ class StripeWebhookController extends Controller
                     $mealPlan = MealPlan::find($subscription->meal_plan_id);
                     $weekStart = now()->startOfWeek();
 
+                    $totalPrice = $mealPlan->recipes_per_week * $mealPlan->price_per_recipe;
+
+                 
                     if (!$user->orders()->where('week_start', $weekStart)->exists() && $mealPlan) {
-                        $recipes = WeeklyRecipe::where('week_start', $weekStart)
-                            ->inRandomOrder()
+                        $recipes = Recipe::inRandomOrder()
                             ->take($mealPlan->recipes_per_week)
                             ->get();
 
                         $order = $user->orders()->create([
                             'week_start' => $weekStart,
+                            'status' => 'completed',
+                            'price' => $totalPrice,
+                            // 'pric'
                         ]);
 
-                        $order->recipes()->attach($recipes->pluck('id'));
-
+                        foreach ($recipes as $recipe) {
+                            $order->recipes()->attach($recipe->id, [
+                                'quantity' => 1,
+                                'price' => $mealPlan->price_per_recipe,
+                                'status' => 'completed',
+                            ]);
+                        }
                         Log::info("Weekly order created for user ID: {$user->id}");
                     }
                 }
