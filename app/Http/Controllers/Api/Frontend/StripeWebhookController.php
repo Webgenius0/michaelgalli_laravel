@@ -40,7 +40,6 @@ class StripeWebhookController extends Controller
                 $user_id = $session->metadata->user_id ?? null;
 
                 $user = User::find($user_id);
-                $user->plan_id = $session->metadata->meal_plan_id ?? null;
                 $user->stripe_id = $session->customer;
                 $user->save();
 
