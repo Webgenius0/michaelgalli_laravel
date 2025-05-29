@@ -3,6 +3,7 @@
 
 namespace App\Http\Controllers\Api\Frontend;
 
+use OpenAI;
 use Stripe\Webhook;
 use App\Models\User;
 use App\Models\Order;
@@ -13,6 +14,7 @@ use App\Models\Subscription;
 use App\Models\WeeklyRecipe;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use App\Models\UserFamilyMember;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 
@@ -44,7 +46,7 @@ class StripeWebhookController extends Controller
                 $user->stripe_id = $session->customer;
                 $user->save();
 
-               
+
                 // If the user is not found, you might want to create a new user or handle it accordingly
                 if (!$user) {
                     Log::warning('User not found for email: ' . $session->customer_email);
@@ -96,7 +98,7 @@ class StripeWebhookController extends Controller
 
                     $totalPrice = $mealPlan->recipes_per_week * $mealPlan->price_per_recipe;
 
-                 
+
                     if (!$user->orders()->where('week_start', $weekStart)->exists() && $mealPlan) {
                         $recipes = Recipe::inRandomOrder()
                             ->take($mealPlan->recipes_per_week)
@@ -112,13 +114,36 @@ class StripeWebhookController extends Controller
                         ]);
 
                         foreach ($recipes as $recipe) {
-                           
+
                             $order->recipes()->create([
                                 'recipe_id' => $recipe->id,
-                                'quantity' => 1, // Assuming quantity is always 1 for simplicity
+                                'quantity' => 1,
                                 'price' => $mealPlan->price_per_recipe ?? 0,
                                 'status' => 'completed',
                             ]);
+
+
+
+                            // ai generate swap ingredients
+
+                            $ingredients = $recipe->ingredientSections;
+                            $members = $user->familyMembers;
+
+                            foreach ($ingredients as $ingredient) {
+                                foreach ($members as $member) {
+                                    $preferences = $this->getDietaryPreferences($member);
+                                    $swapResult = $this->swapIngredientWithAI($ingredient->title, $preferences);
+
+                                    \App\Models\OrderIngredient::create([
+                                        'order_id' => $order->id,
+                                        'recipe_id' => $recipe->id,
+                                        'member_id' => $member->id,
+                                        'original_ingredient' => $ingredient->title,
+                                        'swapped_ingredient' => $swapResult['swap'],
+                                        'reason' => $swapResult['reason'],
+                                    ]);
+                                }
+                            }
                         }
                         Log::info("Weekly order created for user ID: {$user->id}");
                     }
@@ -131,5 +156,48 @@ class StripeWebhookController extends Controller
         }
 
         return response('Webhook processed', 200);
+    }
+
+    protected function getDietaryPreferences(UserFamilyMember $member): array
+    {
+        $responses = $member->userAnswers()->with('quetion')->get();
+
+        $preferences = [];
+
+        foreach ($responses as $response) {
+            $preferences[$response->question->id] = $response->answer_value;
+        }
+
+        return $preferences;
+    }
+
+
+    private function swapIngredientWithAI($ingredient, $preference)
+    {
+        $prompt = "User follows a {$preference} diet. Suggest a suitable swap for the ingredient '{$ingredient}'. Only return the swap and reason.";
+
+        $response = OpenAI::chat()->create([
+            'model' => 'gpt-4',
+            'messages' => [
+                ['role' => 'system', 'content' => 'You are a nutrition assistant AI.'],
+                ['role' => 'user', 'content' => $prompt],
+            ],
+        ]);
+
+        $text = trim($response->choices[0]->message->content ?? '');
+
+        // Try parsing
+        if (preg_match('/Swap:\s*(.*?)\s*[\r\n]+Reason:\s*(.*)/is', $text, $matches)) {
+            return [
+                'swap' => trim($matches[1]),
+                'reason' => trim($matches[2]),
+            ];
+        }
+
+        // Fallback if response is not in expected format
+        return [
+            'swap' => null,
+            'reason' => $text,
+        ];
     }
 }

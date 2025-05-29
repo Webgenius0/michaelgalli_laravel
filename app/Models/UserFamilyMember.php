@@ -45,5 +45,20 @@ class UserFamilyMember extends Model
     }
 
 
+    public function userAnswers()
+    {
+        return $this->hasMany(UserAnswer::class, 'user_family_member_id');
+    }
+
+
+    // question relationship
+    public function questions()
+    {
+        return $this->belongsToMany(Question::class, 'user_answers', 'user_family_member_id', 'question_id')
+                    ->withPivot('answer_text', 'selected_option_value')
+                    ->withTimestamps();
+    }
+
+
     
 }
