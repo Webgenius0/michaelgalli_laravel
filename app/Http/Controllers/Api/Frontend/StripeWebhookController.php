@@ -132,8 +132,8 @@ class StripeWebhookController extends Controller
                             foreach ($ingredients as $ingredient) {
                                 foreach ($members as $member) {
                                     $preferences = $this->getDietaryPreferences($member);
-                                    $swapResult = $this->swapIngredientWithAI($ingredient->title, $preferences);
-
+                                    $preferenceString = implode(', ', $preferences);
+                                    $swapResult = $this->swapIngredientWithAI($ingredient->title, $preferenceString);
                                     \App\Models\OrderIngredient::create([
                                         'order_id' => $order->id,
                                         'recipe_id' => $recipe->id,
@@ -158,14 +158,59 @@ class StripeWebhookController extends Controller
         return response('Webhook processed', 200);
     }
 
+
+
+
+    // public function orderIngredient(Request $request)
+    // {
+
+
+    //     $recipes = Recipe::inRandomOrder()
+    //         ->take(3)
+    //         ->get();
+
+    //     $user = auth('api')->user();
+
+    //     foreach ($recipes as $recipe) {
+
+
+    //         $ingredients = $recipe->ingredientSections;
+    //         $members = $user->familyMembers;
+
+    //         foreach ($ingredients as $ingredient) {
+    //             foreach ($members as $member) {
+    //                 $preferences = $this->getDietaryPreferences($member);
+    //                 $preferenceString = implode(', ', $preferences);
+    //                 $swapResult = $this->swapIngredientWithAI($ingredient->title, $preferenceString);
+
+    //                 \App\Models\OrderIngredient::create([
+    //                     'order_id' => 1,
+    //                     'recipe_id' => $recipe->id,
+    //                     'user_family_member_id' => $member->id,
+    //                     'original_ingredient' => $ingredient->title,
+    //                     'swapped_ingredient' => $swapResult['swap'],
+    //                     'reason' => $swapResult['reason'],
+    //                 ]);
+    //             }
+    //         }
+    //     }
+
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Ingredients ordered successfully.',
+    //         'data' => $recipes,
+    //     ]);
+    // }
+
+
     protected function getDietaryPreferences(UserFamilyMember $member): array
     {
-        $responses = $member->userAnswers()->with('quetion')->get();
+        $responses = $member->userAnswers()->with('question')->get();
 
         $preferences = [];
 
         foreach ($responses as $response) {
-            $preferences[$response->question->id] = $response->answer_value;
+            $preferences[$response->question->id] = $response->selected_option_value;
         }
 
         return $preferences;
@@ -176,7 +221,7 @@ class StripeWebhookController extends Controller
     {
         $prompt = "User follows a {$preference} diet. Suggest a suitable swap for the ingredient '{$ingredient}'. Only return the swap and reason.";
 
-        $response = OpenAI::chat()->create([
+        $response = OpenAI::client(config('services.openai.key'))->chat()->create([
             'model' => 'gpt-4',
             'messages' => [
                 ['role' => 'system', 'content' => 'You are a nutrition assistant AI.'],

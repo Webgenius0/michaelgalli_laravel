@@ -1,30 +1,31 @@
 <?php
 
-use App\Http\Controllers\Api\Auth\RegisterController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\Api\Auth\UserController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\LogoutController;
-use App\Http\Controllers\Api\Auth\ResetPasswordController;
-use App\Http\Controllers\Api\Auth\UserController;
-use App\Http\Controllers\Api\Auth\SocialLoginController;
-use App\Http\Controllers\Api\ChatController;
-use App\Http\Controllers\Api\FirebaseTokenController;
-use App\Http\Controllers\Api\Frontend\categoryController;
-use App\Http\Controllers\Api\Frontend\DeliveryAddressController;
 use App\Http\Controllers\Api\Frontend\FaqController;
-use App\Http\Controllers\Api\Frontend\HomeController;
-use App\Http\Controllers\Api\Frontend\ImageController;
-use App\Http\Controllers\Api\Frontend\PostController;
-use App\Http\Controllers\Api\Frontend\QuestionController;
-use App\Http\Controllers\Api\Frontend\RecipeManageController;
-use App\Http\Controllers\Api\Frontend\SubcategoryController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\Auth\RegisterController;
+use App\Http\Controllers\Api\FirebaseTokenController;
+use App\Http\Controllers\Api\Frontend\HomeController;
+use App\Http\Controllers\Api\Frontend\PostController;
+use App\Http\Controllers\Api\Frontend\ImageController;
+use App\Http\Controllers\Api\Auth\SocialLoginController;
+use App\Http\Controllers\Api\Frontend\categoryController;
+use App\Http\Controllers\Api\Frontend\QuestionController;
 use App\Http\Controllers\Api\Frontend\SettingsController;
-use App\Http\Controllers\Api\Frontend\SocialLinksController;
+use App\Http\Controllers\Api\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\Frontend\SubscriberController;
-use App\Http\Controllers\Api\Frontend\SubscriptionController;
-use App\Http\Controllers\Api\Frontend\UserFamilyMemberController;
+use App\Http\Controllers\Api\Frontend\SocialLinksController;
+use App\Http\Controllers\Api\Frontend\SubcategoryController;
 use App\Http\Controllers\Api\Frontend\UserProfileController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Frontend\RecipeManageController;
+use App\Http\Controllers\Api\Frontend\SubscriptionController;
+use App\Http\Controllers\Api\Frontend\StripeWebhookController;
+use App\Http\Controllers\Api\Frontend\DeliveryAddressController;
+use App\Http\Controllers\Api\Frontend\UserFamilyMemberController;
 
 
 //page
@@ -160,6 +161,9 @@ Route::middleware(['auth:api'])->controller(SubscriptionController::class)->pref
     Route::post('/cancel', 'cancelSubscription');
 });
 
+// stripe webhook
+
+// Route::post('/orders', [StripeWebhookController::class, 'orderIngredient'])->middleware('auth:api');
 
 
 
