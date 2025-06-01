@@ -103,6 +103,7 @@ class StripeWebhookController extends Controller
                     $user = $subscription->user;
                     $mealPlan = MealPlan::find($subscription->meal_plan_id);
                     $weekStart = now()->startOfWeek();
+                    
 
                     $totalPrice = $mealPlan->recipes_per_week * $mealPlan->price_per_recipe;
 
@@ -112,7 +113,7 @@ class StripeWebhookController extends Controller
                             ->take($mealPlan->recipes_per_week)
                             ->get();
 
-                        Log::info("Creating weekly order for user ID: {$recipes} with meal plan ID: {$mealPlan->id}");
+                        Log::info($recipes);
 
                         $order = $user->orders()->create([
                             'week_start' => $weekStart,
