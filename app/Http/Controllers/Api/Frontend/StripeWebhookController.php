@@ -69,7 +69,7 @@ class StripeWebhookController extends Controller
 
 
 
-                    Subscription::updateOrCreate(
+                    $sub=   Subscription::updateOrCreate(
                         ['stripe_subscription_id' => $subscription->id],
                         [
                             'user_id' => $user->id,
@@ -82,6 +82,8 @@ class StripeWebhookController extends Controller
                             'ends_at' => $subscription->cancel_at_period_end ? Carbon::createFromTimestamp($subscription->current_period_end) : null,
                         ]
                     );
+
+                    Log::info('Subscription updated or created for user ID: ' . $sub);
                 }
                 break;
 
@@ -134,7 +136,7 @@ class StripeWebhookController extends Controller
                                     $preferences = $this->getDietaryPreferences($member);
                                     $preferenceString = implode(', ', $preferences);
                                     $swapResult = $this->swapIngredientWithAI($ingredient->title, $preferenceString);
-                                    \App\Models\OrderIngredient::create([
+                                 $order_in =      \App\Models\OrderIngredient::create([
                                         'order_id' => $order->id,
                                         'recipe_id' => $recipe->id,
                                         'member_id' => $member->id,
@@ -144,6 +146,8 @@ class StripeWebhookController extends Controller
                                     ]);
                                 }
                             }
+
+                            Log::info($order_in);
                         }
                         Log::info("Weekly order created for user ID: {$user->id}");
                     }
@@ -161,45 +165,45 @@ class StripeWebhookController extends Controller
 
 
 
-    // public function orderIngredient(Request $request)
-    // {
+    public function orderIngredient(Request $request)
+    {
 
-    //     $recipes = Recipe::inRandomOrder()
-    //         ->take(3)
-    //         ->get();
+        $recipes = Recipe::inRandomOrder()
+            ->take(3)
+            ->get();
 
-    //     $user = auth('api')->user();
+        $user = auth('api')->user();
 
-    //     foreach ($recipes as $recipe) {
+        foreach ($recipes as $recipe) {
 
 
-    //         $ingredients = $recipe->ingredientSections;
-    //         $members = $user->familyMembers;
+            $ingredients = $recipe->ingredientSections;
+            $members = $user->familyMembers;
 
-    //         foreach ($ingredients as $ingredient) {
-    //             foreach ($members as $member) {
-    //                 $preferences = $this->getDietaryPreferences($member);
-    //                 $preferenceString = implode(', ', $preferences);
-    //                 $swapResult = $this->swapIngredientWithAI($ingredient->title, $preferenceString);
+            foreach ($ingredients as $ingredient) {
+                foreach ($members as $member) {
+                    $preferences = $this->getDietaryPreferences($member);
+                    $preferenceString = implode(', ', $preferences);
+                    $swapResult = $this->swapIngredientWithAI($ingredient->title, $preferenceString);
 
-    //                 \App\Models\OrderIngredient::create([
-    //                     'order_id' => 1,
-    //                     'recipe_id' => $recipe->id,
-    //                     'user_family_member_id' => $member->id,
-    //                     'original_ingredient' => $ingredient->title,
-    //                     'swapped_ingredient' => $swapResult['swap'],
-    //                     'reason' => $swapResult['reason'],
-    //                 ]);
-    //             }
-    //         }
-    //     }
+                    \App\Models\OrderIngredient::create([
+                        'order_id' => 1,
+                        'recipe_id' => $recipe->id,
+                        'user_family_member_id' => $member->id,
+                        'original_ingredient' => $ingredient->title,
+                        'swapped_ingredient' => $swapResult['swap'],
+                        'reason' => $swapResult['reason'],
+                    ]);
+                }
+            }
+        }
 
-    //     return response()->json([
-    //         'status' => true,
-    //         'message' => 'Ingredients ordered successfully.',
-    //         'data' => $recipes,
-    //     ]);
-    // }
+        return response()->json([
+            'status' => true,
+            'message' => 'Ingredients ordered successfully.',
+            'data' => $recipes,
+        ]);
+    }
 
 
     protected function getDietaryPreferences(UserFamilyMember $member): array

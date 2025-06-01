@@ -157,7 +157,7 @@ Route::middleware(['auth:api'])->controller(SubscriptionController::class)->pref
 
 // stripe webhook
 
-// Route::post('/orders', [StripeWebhookController::class, 'orderIngredient'])->middleware('auth:api');
+Route::post('/orders', [StripeWebhookController::class, 'orderIngredient'])->middleware('auth:api');
 
 
 
