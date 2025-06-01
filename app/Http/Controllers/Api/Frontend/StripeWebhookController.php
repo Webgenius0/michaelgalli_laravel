@@ -154,7 +154,7 @@ class StripeWebhookController extends Controller
                                  $order_in =      \App\Models\OrderIngredient::create([
                                         'order_id' => $order->id,
                                         'recipe_id' => $recipe->id,
-                                        'member_id' => $member->id,
+                                        'user_family_member_id' => $member->id,
                                         'original_ingredient' => $ingredient->title,
                                         'swapped_ingredient' => $swapResult['swap'],
                                         'reason' => $swapResult['reason'],
