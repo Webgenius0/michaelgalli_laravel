@@ -102,7 +102,7 @@ class StripeWebhookController extends Controller
                 if ($subscription && $subscription->stripe_status === 'active') {
                     $user = $subscription->user;
                     $mealPlan = MealPlan::find($subscription->meal_plan_id);
-                    log("Meal Plan: {$mealPlan}");
+                    
                     if (!$mealPlan) {
                         Log::warning('Meal Plan not found for subscription ID: ' . $subscriptionId);
                         return response('Meal Plan not found.', 404);
@@ -118,7 +118,7 @@ class StripeWebhookController extends Controller
                         Log::info($mealPlan);
                         Log::info($mealPlan->recipes_per_week);
                         $recipes = Recipe::inRandomOrder()
-                            ->take($mealPlan->recipes_per_week)
+                            ->take(3)
                             ->get();
 
                         Log::info($recipes);
