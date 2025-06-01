@@ -109,6 +109,9 @@ class StripeWebhookController extends Controller
 
 
                     if (!$user->orders()->where('week_start', $weekStart)->exists() && $mealPlan) {
+
+                        Log::info($mealPlan);
+                        Log::info($mealPlan->recipes_per_week);
                         $recipes = Recipe::inRandomOrder()
                             ->take($mealPlan->recipes_per_week)
                             ->get();
