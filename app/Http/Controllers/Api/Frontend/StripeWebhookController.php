@@ -93,6 +93,12 @@ class StripeWebhookController extends Controller
 
                 $subscription = Subscription::where('stripe_subscription_id', $subscriptionId)->first();
 
+                Log::info('Invoice Payment Succeeded: ', [
+                    'subscription_id' => $subscriptionId,
+                    'amount_paid' => $invoice->amount_paid,
+                    'status' => $invoice->status,
+                ]);
+
                 if ($subscription && $subscription->stripe_status === 'active') {
                     $user = $subscription->user;
                     $mealPlan = MealPlan::find($subscription->meal_plan_id);
