@@ -164,7 +164,6 @@ class StripeWebhookController extends Controller
     // public function orderIngredient(Request $request)
     // {
 
-
     //     $recipes = Recipe::inRandomOrder()
     //         ->take(3)
     //         ->get();

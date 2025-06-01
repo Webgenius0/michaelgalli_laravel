@@ -49,12 +49,6 @@ Route::get('/recipe/details/{id}', [RecipeManageController::class, 'recipe_detai
 
 
 
-
-
-
-
-
-
 /*
 # Post
 */
