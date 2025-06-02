@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserFamilyMember extends Model
 {
-    
+
     protected $fillable = [
         'user_id',
         'first_name',
@@ -55,10 +55,13 @@ class UserFamilyMember extends Model
     public function questions()
     {
         return $this->belongsToMany(Question::class, 'user_answers', 'user_family_member_id', 'question_id')
-                    ->withPivot('answer_text', 'selected_option_value')
-                    ->withTimestamps();
+            ->withPivot('answer_text', 'selected_option_value')
+            ->withTimestamps();
     }
 
 
-    
+    public function subscriptions()
+    {
+        return $this->belongsToMany(Subscription::class, 'subscription_family_members');
+    }
 }

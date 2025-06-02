@@ -156,15 +156,14 @@ Route::middleware(['auth:api'])->controller(SubscriptionController::class)->pref
 });
 
 // stripe webhook
-
 Route::post('/orders', [StripeWebhookController::class, 'orderIngredient'])->middleware('auth:api');
-
-
 
 
 /*
 # In App Notification Route
 */
+
+
 
 Route::middleware(['auth:api'])->controller(NotificationController::class)->prefix('notify')->group(function () {
     Route::get('test', 'test');

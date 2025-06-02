@@ -42,4 +42,10 @@ class Subscription extends Model
     {
         return $this->belongsTo(MealPlan::class);
     }
+
+
+    public function familyMembers()
+    {
+        return $this->belongsToMany(UserFamilyMember::class, 'subscription_family_members');
+    }
 }
