@@ -135,7 +135,7 @@ class RecipeController extends Controller
             'title' => 'required|string|max:255',
             'short_description' => 'nullable|string',
             'long_description' => 'nullable|string',
-            'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif',
 
             'protein_id' => 'nullable|exists:proteins,id',
             'calory_id' => 'nullable|exists:calories,id',

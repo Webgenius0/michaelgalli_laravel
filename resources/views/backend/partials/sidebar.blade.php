@@ -55,10 +55,27 @@
                     </a>
                 </li>
 
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->routeIs('recipe') ? 'has-link' : '' }}"
+                        href="{{ route('admin.recipe.index') }}">
+                        <i class="fa-solid fa-blog side-menu__icon"></i>
+                        <span class="side-menu__label">Recipe manage</span>
+                    </a>
+                </li>
+
+
+                 <li class="slide">
+                    <a class="side-menu__item {{ request()->routeIs('weekly_recipe') ? 'has-link' : '' }}"
+                        href="{{ route('admin.weekly_recipe.create') }}">
+                        <i class="fa-solid fa-calendar-week side-menu__icon"></i>
+                        <span class="side-menu__label">Weekly Recipe</span>
+                    </a>
+                </li>
+
 
 
                 @php
-                    $isRecipeActive = request()->routeIs('admin.category.*','admin.protein.*','admin.time_to_clock.*', 'admin.cuisine.*','admin.health_goal.*', 'admin.calories.*', 'admin.carb.*', 'admin.recipe.*');
+                    $isRecipeActive = request()->routeIs('admin.category.*','admin.protein.*','admin.time_to_clock.*', 'admin.cuisine.*','admin.health_goal.*', 'admin.calories.*', 'admin.carb.*');
                 @endphp
 
                 <li class="slide {{ $isRecipeActive ? 'is-expanded' : '' }}">
@@ -139,22 +156,7 @@
                         <span class="side-menu__label">Sub Category</span>
                     </a>
                 </li> --}}
-                <li class="slide">
-                    <a class="side-menu__item {{ request()->routeIs('recipe') ? 'has-link' : '' }}"
-                        href="{{ route('admin.recipe.index') }}">
-                        <i class="fa-solid fa-blog side-menu__icon"></i>
-                        <span class="side-menu__label">Recipe manage</span>
-                    </a>
-                </li>
-
-
-                 {{-- <li class="slide">
-                    <a class="side-menu__item {{ request()->routeIs('weekly_recipe') ? 'has-link' : '' }}"
-                        href="{{ route('admin.weekly_recipe.create') }}">
-                        <i class="fa-solid fa-calendar-week side-menu__icon"></i>
-                        <span class="side-menu__label">Weekly Recipe</span>
-                    </a>
-                </li> --}}
+                
 
 
 

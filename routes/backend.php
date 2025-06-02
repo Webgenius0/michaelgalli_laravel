@@ -159,9 +159,14 @@ Route::controller(WeeklyRecipeController::class)->prefix('weekly-recipe')->name(
     Route::get('/show/{id}', 'show')->name('show');
     Route::get('/edit/{id}', 'edit')->name('edit');
     Route::post('/update/{id}', 'update')->name('update');
-    Route::delete('/delete/{id}', 'destroy')->name('destroy');
     Route::get('/status/{id}', 'status')->name('status');
+
+
+    Route::post('/recipe/add/{week_id}', 'add_recipe')->name('recipe.recipe_add');
+    Route::delete('/recipe/delete/{id}', 'destroy')->name('recipe.delete');
+
 });
+
 
 
 Route::controller(MealPlanController::class)->prefix('meal-plan')->name('meal_plan.')->group(function () {

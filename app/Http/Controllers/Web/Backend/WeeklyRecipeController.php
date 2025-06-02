@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Web\Backend;
 use App\Models\Recipe;
 use App\Models\MealPlan;
 use App\Models\WeeklyRecipe;
+use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 
@@ -38,8 +38,6 @@ class WeeklyRecipeController extends Controller
                                     <i class="fe fe-edit"></i>
                                 </a>
 
-                                
-
                                 <a href="#" type="button" onclick="showDeleteConfirm(`' . $encryptedId . '`)" class="btn btn-danger fs-14 text-white" title="Delete">
                                     <i class="fe fe-trash"></i>
                                 </a>
@@ -55,17 +53,25 @@ class WeeklyRecipeController extends Controller
     /**
      * Show the form for creating a new resource.
      */
+
     public function create()
     {
         $recipes = Recipe::all();
-        $weeks = WeeklyRecipe::select('week_start')
+
+        $weekStarts = WeeklyRecipe::select('week_start')
             ->groupBy('week_start')
             ->orderBy('week_start', 'desc')
             ->get()
-            ->map(function ($week) {
-                $week->recipes = WeeklyRecipe::where('week_start', $week->week_start)->with('recipe')->get()->pluck('recipe');
-                return $week;
-            });
+            ->pluck('week_start');
+
+        $weeks = $weekStarts->map(function ($week_start) {
+            return (object)[
+                'week_start' => $week_start,
+                'recipes' => WeeklyRecipe::where('week_start', $week_start)->with('recipe')->get()->pluck('recipe'),
+                
+                'id' => WeeklyRecipe::where('week_start', $week_start)->first()->id,
+            ];
+        });
 
         return view('backend.layouts.weekly_recipe.create', compact(
             'recipes',
@@ -79,15 +85,21 @@ class WeeklyRecipeController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+       
+        $rules = [
             'week_start' => 'required|date',
             'recipe_ids' => 'required|array|min:1',
             'recipe_ids.*' => 'exists:recipes,id',
-        ]);
+        ];
+
+        
+
+        Validator::make($request->all(), $rules);
 
         DB::beginTransaction();
+
         try {
-            // Delete old entries for the same week if re-assigning
+            // delete week 
             WeeklyRecipe::where('week_start', $request->week_start)->delete();
 
             foreach ($request->recipe_ids as $recipeId) {
@@ -98,6 +110,7 @@ class WeeklyRecipeController extends Controller
             }
 
             DB::commit();
+
             return redirect()->back()->with('success', 'Recipes assigned for the week.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -106,138 +119,56 @@ class WeeklyRecipeController extends Controller
     }
 
 
-    /**
-     * Display the specified resource.
-     */
-    public function show($encryptedId)
-    {
-
-
-        $id = Crypt::decryptString($encryptedId);
-
-
-        $recipe = Recipe::with([
-            'ingredientSections.ingredients',
-            'protein',
-            'calory',
-            'carb',
-            'cuisine',
-            'time_to_clock',
-            'health_goal',
-            'instructions' => fn($q) => $q->orderBy('step_number')
-        ])->findOrFail($id);
-
-
-
-        return view('backend.layouts.weekly_recipe.show', compact('recipe'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($encryptedId)
-    {
-        $id = Crypt::decryptString($encryptedId);
-
-
-        $meal_plan = MealPlan::findOrFail($id);
-
-
-        return view('backend.layouts.weekly_recipe.edit', compact(
-            'meal_plan',
-            'encryptedId'
-        ));
-    }
-
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $encryptedId)
-    {
-        $id = Crypt::decryptString($encryptedId);
-
-        $rules = [
-            'name' => 'required|string|max:255',
-            'people' => 'required|integer|min:1',
-            'recipes_per_week' => 'required|integer|min:1',
-            'price_per_serving' => 'required|numeric|min:0',
-            'stripe_price_id' => 'required|string|max:255',
-        ];
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        try {
-            DB::beginTransaction();
-
-            $recipe = MealPlan::findOrFail($id);
-            $recipe->name = $request->name;
-            $recipe->people = $request->people;
-            $recipe->recipes_per_week = $request->recipes_per_week;
-            $recipe->price_per_serving = $request->price_per_serving;
-            $recipe->stripe_price_id = $request->stripe_price_id;
-            $recipe->save();
-
-            DB::commit();
-
-            return redirect()->route('admin.meal_plan.index')->with('t-success', 'Recipe updated successfully.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('t-error', 'Error: ' . $e->getMessage())->withInput();
-        }
-    }
-
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $encryptedId)
+    public function destroy($id)
     {
         try {
-            $id = Crypt::decryptString($encryptedId);
 
-            $meal_plan = MealPlan::findOrFail($id);
-            if (!$meal_plan) {
+            $weekly_recipe = WeeklyRecipe::where('recipe_id', $id)->first();
+            if (!$weekly_recipe) {
                 return response()->json([
                     'status' => 't-error',
-                    'message' => 'Meal plan not found.',
+                    'message' => 'Weekly recipe not found.',
                 ], 404);
             }
 
             // use soft delete
-            $meal_plan->delete();
-
-            return response()->json([
-                'status' => 't-success',
-                'message' => 'Meal deleted successfully!',
-            ]);
+            $weekly_recipe->delete();
+            return redirect()->back()->with('success', 'Weekly recipe deleted.');
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => 't-error',
-                'message' => 'Delete failed: ' . $e->getMessage(),
-            ], 500);
+            return redirect()->back()->with('error', 'Failed to assign recipes: ' . $e->getMessage());
         }
     }
 
 
-    public function status(int $id): JsonResponse
-    {
-        $data = Recipe::findOrFail($id);
-        if (!$data) {
-            return response()->json([
-                'status' => 't-error',
-                'message' => 'Item not found.',
-            ]);
-        }
-        $data->delete();
 
-        return response()->json([
-            'status' => 't-success',
-            'message' => 'Your action was successful!',
+    public function add_recipe(Request $request, $weekId)
+    {
+        $request->validate([
+            'recipe_id' => 'required|exists:recipes,id',
         ]);
+
+
+        $week = WeeklyRecipe::findOrFail($weekId);
+
+
+        $alreadyAssigned = WeeklyRecipe::where('week_start', $week->week_start)
+            ->where('recipe_id', $request->recipe_id)
+            ->exists();
+
+        if ($alreadyAssigned) {
+            return back()->with('error', 'This recipe is already assigned to the selected week.');
+        }
+
+        // Assign the new recipe to the same week_start
+        WeeklyRecipe::create([
+            'week_start' => $week->week_start,
+            'recipe_id' => $request->recipe_id,
+        ]);
+
+        return back()->with('success', 'Recipe added to the week successfully.');
     }
 }
