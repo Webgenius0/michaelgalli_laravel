@@ -48,6 +48,8 @@ class SubscriptionController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'meal_plan_id' => 'required|exists:meal_plans,id',
+            'member_ids' => 'array',
+            'member_ids' => 'exists:user_family_members,id'
         ]);
 
         if ($validator->fails()) {
@@ -84,6 +86,7 @@ class SubscriptionController extends Controller
                 'metadata' => [
                     'user_id' => auth('api')->id(),
                     'meal_plan_id' => $meal_plan->id,
+                    'member_ids' => implode(',', $request->member_ids ?? []),
                 ],
             ]);
 

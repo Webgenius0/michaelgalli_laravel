@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
 use App\Models\UserFamilyMember;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Models\SubscriptionFamilyMember;
 
 class StripeWebhookController extends Controller
 {
@@ -39,80 +40,68 @@ class StripeWebhookController extends Controller
 
             case 'checkout.session.completed':
 
-                    $session = $event->data->object;
-                    $user_id = $session->metadata->user_id ?? null;
+                $session = $event->data->object;
+                $user_id = $session->metadata->user_id ?? null;
 
-                    $user = User::find($user_id);
-                    $user->stripe_id = $session->customer;
-                    $user->save();
 
-                    if (!$user) {
-                        Log::warning('User not found for email: ' . $session->customer_email);
-                        return response('User not found.', 404);
-                    }
+                $memberIdsString = $session->metadata->member_ids ?? '';
+                $memberIds = array_filter(explode(',', $memberIdsString));
 
-                    if ($user) {
-                        $stripe = new StripeClient(config('services.stripe.secret'));
-                        $subscription = $stripe->subscriptions->retrieve($session->subscription);
 
-                        // log the subscription details
-                        Log::info('Stripe Subscription Details: ', [
-                            'id' => $subscription->id,
-                            'status' => $subscription->status,
-                            'price_id' => $subscription->items->data[0]->price->id ?? null,
+                $user = User::find($user_id);
+                $user->stripe_id = $session->customer;
+                $user->save();
+
+                if (!$user) {
+                    Log::warning('User not found for email: ' . $session->customer_email);
+                    return response('User not found.', 404);
+                }
+
+                if ($user) {
+                    $stripe = new StripeClient(config('services.stripe.secret'));
+                    $subscription = $stripe->subscriptions->retrieve($session->subscription);
+
+                    $sub =   Subscription::updateOrCreate(
+                        ['stripe_subscription_id' => $subscription->id],
+                        [
+                            'user_id' => $user->id,
+                            'meal_plan_id' => $session->metadata->meal_plan_id ?? null,
+                            'type' => 'stripe',
+                            'stripe_status' => $subscription->status,
+                            'stripe_price' => $subscription->items->data[0]->price->id ?? null,
                             'quantity' => $subscription->items->data[0]->quantity ?? 1,
-                            'trial_end' => $subscription->trial_end,
-                            'current_period_end' => $subscription->current_period_end,
+                            'trial_ends_at' => $subscription->trial_end ? Carbon::createFromTimestamp($subscription->trial_end) : null,
+                            'ends_at' => $subscription->cancel_at_period_end ? Carbon::createFromTimestamp($subscription->current_period_end) : null,
+                        ]
+                    );
+
+
+                    foreach ($memberIds as $memberId) {
+                        SubscriptionFamilyMember::create([
+                            'subscription_id' => $sub->id,
+                            'user_family_member_id' => $memberId,
                         ]);
-
-
-
-                        $sub =   Subscription::updateOrCreate(
-                            ['stripe_subscription_id' => $subscription->id],
-                            [
-                                'user_id' => $user->id,
-                                'meal_plan_id' => $session->metadata->meal_plan_id ?? null,
-                                'type' => 'stripe',
-                                'stripe_status' => $subscription->status,
-                                'stripe_price' => $subscription->items->data[0]->price->id ?? null,
-                                'quantity' => $subscription->items->data[0]->quantity ?? 1,
-                                'trial_ends_at' => $subscription->trial_end ? Carbon::createFromTimestamp($subscription->trial_end) : null,
-                                'ends_at' => $subscription->cancel_at_period_end ? Carbon::createFromTimestamp($subscription->current_period_end) : null,
-                            ]
-                        );
-
-                        Log::info('Subscription updated or created for user ID: ' . $sub);
                     }
-                    break;
+
+
+                }
+                break;
 
             case 'invoice.payment_succeeded':
-
-
 
                 $invoice = $event->data->object;
                 $subscriptionId = $invoice->subscription;
 
-                $subscription = Subscription::where('stripe_subscription_id', $subscriptionId)->first();
+                $subscription = Subscription::with('familyMembers')->where('stripe_subscription_id', $subscriptionId)->first();
 
-                Log::info('Invoice Payment Succeeded: ', [
-                    'subscription_id' => $subscriptionId,
-                    'amount_paid' => $invoice->amount_paid,
-                    'status' => $invoice->status,
-                ]);
 
                 if ($subscription && $subscription->stripe_status === 'active') {
+
                     $user = $subscription->user;
                     $mealPlan = MealPlan::find($subscription->meal_plan_id);
 
-                    if (!$mealPlan) {
-                        Log::warning('Meal Plan not found for subscription ID: ' . $subscriptionId);
-                        return response('Meal Plan not found.', 404);
-                    }
                     $weekStart = now()->startOfWeek();
-
-
                     $totalPrice = $mealPlan->recipes_per_week * $mealPlan->price_per_recipe;
-
 
                     if (!$user->orders()->where('week_start', $weekStart)->exists() && $mealPlan) {
 
@@ -121,8 +110,6 @@ class StripeWebhookController extends Controller
                         $recipes = Recipe::inRandomOrder()
                             ->take(3)
                             ->get();
-
-                        Log::info($recipes);
 
                         $order = $user->orders()->create([
                             'week_start' => $weekStart,
@@ -145,14 +132,14 @@ class StripeWebhookController extends Controller
                             // ai generate swap ingredients
 
                             $ingredients = $recipe->ingredientSections;
-                            $members = $user->familyMembers;
+                            $members = $subscription->familyMembers;
 
                             foreach ($ingredients as $ingredient) {
                                 foreach ($members as $member) {
                                     $preferences = $this->getDietaryPreferences($member);
                                     $preferenceString = implode(', ', $preferences);
                                     $swapResult = $this->swapIngredientWithAI($ingredient->title, $preferenceString);
-                                    $order_in =      \App\Models\OrderIngredient::create([
+                                    $order_ingredient = \App\Models\OrderIngredient::create([
                                         'order_id' => $order->id,
                                         'recipe_id' => $recipe->id,
                                         'user_family_member_id' => $member->id,
@@ -162,64 +149,18 @@ class StripeWebhookController extends Controller
                                     ]);
                                 }
                             }
-
-                            Log::info($order_in);
                         }
-                        Log::info("Weekly order created for user ID: {$user->id}");
                     }
                 }
                 break;
 
             default:
-                // You can handle more events here if needed
+
                 break;
         }
 
         return response('Webhook processed', 200);
     }
-
-
-
-
-    // public function orderIngredient(Request $request)
-    // {
-
-    //     $recipes = Recipe::inRandomOrder()
-    //         ->take(3)
-    //         ->get();
-
-    //     $user = auth('api')->user();
-
-    //     foreach ($recipes as $recipe) {
-
-
-    //         $ingredients = $recipe->ingredientSections;
-    //         $members = $user->familyMembers;
-
-    //         foreach ($ingredients as $ingredient) {
-    //             foreach ($members as $member) {
-    //                 $preferences = $this->getDietaryPreferences($member);
-    //                 $preferenceString = implode(', ', $preferences);
-    //                 $swapResult = $this->swapIngredientWithAI($ingredient->title, $preferenceString);
-
-    //                 \App\Models\OrderIngredient::create([
-    //                     'order_id' => 1,
-    //                     'recipe_id' => $recipe->id,
-    //                     'user_family_member_id' => $member->id,
-    //                     'original_ingredient' => $ingredient->title,
-    //                     'swapped_ingredient' => $swapResult['swap'],
-    //                     'reason' => $swapResult['reason'],
-    //                 ]);
-    //             }
-    //         }
-    //     }
-
-    //     return response()->json([
-    //         'status' => true,
-    //         'message' => 'Ingredients ordered successfully.',
-    //         'data' => $recipes,
-    //     ]);
-    // }
 
 
     protected function getDietaryPreferences(UserFamilyMember $member): array
@@ -258,7 +199,7 @@ class StripeWebhookController extends Controller
             ];
         }
 
-        // Fallback if response is not in expected format
+        // response is not in expected format
         return [
             'swap' => null,
             'reason' => $text,

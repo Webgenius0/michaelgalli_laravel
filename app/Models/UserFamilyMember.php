@@ -60,8 +60,11 @@ class UserFamilyMember extends Model
     }
 
 
+    
     public function subscriptions()
     {
         return $this->belongsToMany(Subscription::class, 'subscription_family_members');
     }
+
+
 }
