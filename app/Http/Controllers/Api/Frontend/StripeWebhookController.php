@@ -75,14 +75,15 @@ class StripeWebhookController extends Controller
                         ]
                     );
 
-
                     // user family member subscribe 
                     foreach ($memberIds as $memberId) {
-                        SubscriptionFamilyMember::create([
+                        $user_subscription =  SubscriptionFamilyMember::create([
                             'subscription_id' => $sub->id,
                             'user_family_member_id' => $memberId,
                         ]);
                     }
+                    Log::warning('User subs: ' . $user_subscription);
+
 
 
                 }
@@ -183,7 +184,7 @@ class StripeWebhookController extends Controller
         $prompt = "User follows a {$preference} diet. Suggest a suitable swap for the ingredient '{$ingredient}'. Only return the swap and reason.";
 
         $response = OpenAI::client(config('services.openai.key'))->chat()->create([
-            'model' => 'gpt-4',
+            'model' => 'gpt-4', 
             'messages' => [
                 ['role' => 'system', 'content' => 'You are a nutrition assistant AI.'],
                 ['role' => 'user', 'content' => $prompt],
