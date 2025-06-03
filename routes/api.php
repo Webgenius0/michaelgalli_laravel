@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\Frontend\RecipeManageController;
 use App\Http\Controllers\Api\Frontend\SubscriptionController;
 use App\Http\Controllers\Api\Frontend\StripeWebhookController;
 use App\Http\Controllers\Api\Frontend\DeliveryAddressController;
+use App\Http\Controllers\Api\Frontend\UserDnaReportController;
 use App\Http\Controllers\Api\Frontend\UserFamilyMemberController;
 
 
@@ -99,16 +100,6 @@ Route::group(['middleware' => ['auth:api', 'api-otp']], function ($router) {
     Route::delete('/delete-profile', [UserController::class, 'destroy']);
 });
 
-/*
-# Firebase Notification Route
-*/
-
-Route::middleware(['auth:api'])->controller(FirebaseTokenController::class)->prefix('firebase')->group(function () {
-    Route::get("test", "test");
-    Route::post("token/add", "store");
-    Route::post("token/get", "getToken");
-    Route::post("token/delete", "deleteToken");
-})->middleware('auth:api');
 
 
 Route::middleware(['auth:api'])->controller(QuestionController::class)->prefix('question')->group(function () {
@@ -143,6 +134,15 @@ Route::middleware(['auth:api'])->controller(UserFamilyMemberController::class)->
 });
 
 
+// user family member
+Route::middleware(['auth:api'])->controller(UserDnaReportController::class)->prefix('user/dna/report')->group(function () {
+    
+    Route::post('/store', 'store');
+    
+});
+
+
+
 // subscribe
 Route::middleware(['auth:api'])->controller(SubscriptionController::class)->prefix('subscriber')->group(function () {
 
@@ -159,11 +159,32 @@ Route::middleware(['auth:api'])->controller(SubscriptionController::class)->pref
 Route::post('/orders', [StripeWebhookController::class, 'orderIngredient'])->middleware('auth:api');
 
 
+
+
+/*
+# Firebase Notification Route
+*/
+
+Route::middleware(['auth:api'])->controller(FirebaseTokenController::class)->prefix('firebase')->group(function () {
+    Route::get("test", "test");
+    Route::post("token/add", "store");
+    Route::post("token/get", "getToken");
+    Route::post("token/delete", "deleteToken");
+})->middleware('auth:api');
+
+
+
+
+
+
+
+
+
+
+
 /*
 # In App Notification Route
 */
-
-
 
 Route::middleware(['auth:api'])->controller(NotificationController::class)->prefix('notify')->group(function () {
     Route::get('test', 'test');

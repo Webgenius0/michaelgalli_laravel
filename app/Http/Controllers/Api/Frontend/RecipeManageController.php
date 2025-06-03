@@ -131,9 +131,39 @@ class RecipeManageController extends Controller
             ];
         })->toArray();
 
-        // Build the prompt to instruct the AI to return JSON in the required structure
-        $prompt = "
-                    You are a professional nutritionist and meal planner.
+        // $memberProfiles = $members->map(function ($member) {
+        //     $dnaTraits = $member->dnaTraits ?? collect();
+
+        //     // If DNA traits exist, prioritize them
+        //     if ($dnaTraits->isNotEmpty()) {
+        //         return [
+        //             'member_id' => $member->id,
+        //             'member_name' => $member->first_name ?? null,
+        //             'dna_traits' => $dnaTraits->map(function ($trait) {
+        //                 return [
+        //                     'trait' => $trait->trait,
+        //                     'value' => $trait->value,
+        //                 ];
+        //             })->toArray()
+        //         ];
+        //     }
+
+        //     // Otherwise, fall back to quiz answers
+        //     return [
+        //         'member_id' => $member->id,
+        //         'member_name' => $member->first_name ?? null,
+        //         'answers' => $member->userAnswers->map(function ($answer) {
+        //             return [
+        //                 'question_id' => $answer->question_id,
+        //                 'answer_text' => $answer->answer_text,
+        //                 'selected_option_value' => $answer->selected_option_value,
+        //             ];
+        //         })->toArray(),
+        //     ];
+        // })->toArray();
+
+        // build the prompt to instruct the AI to return JSON in the required structure
+        $prompt = " You are a professional nutritionist and meal planner.
 
                     Given the recipe titled '{$recipe->title}' with ingredients:
                     " . implode(", ", $originalIngredients) . "
@@ -170,9 +200,6 @@ class RecipeManageController extends Controller
         ]);
 
         $content = $response->json('choices.0.message.content') ?? null;
-
-
-       
 
         $aiIngredients = null;
         if ($content) {

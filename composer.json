@@ -19,6 +19,7 @@
         "laravel/tinker": "^2.9",
         "openai-php/client": "^0.13.0",
         "propaganistas/laravel-phone": "^6.0",
+        "smalot/pdfparser": "^2.12",
         "spatie/laravel-permission": "^6.10",
         "stripe/stripe-php": "^16.6",
         "tymon/jwt-auth": "^2.1",
