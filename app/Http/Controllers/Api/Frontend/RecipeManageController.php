@@ -71,7 +71,7 @@ class RecipeManageController extends Controller
     public function recipe_details(Request $request, $id)
     {
 
-        $recipe = Recipe::with(['ingredientSections.ingredients'])->find($id);
+        $recipe = Recipe::with(['ingredientSections.ingredients', 'instructions'])->find($id);
         if (!$recipe) {
             return response()->json(['success' => false, 'message' => 'Recipe not found'], 404);
         }
@@ -103,8 +103,12 @@ class RecipeManageController extends Controller
             'success' => true,
             'id' => $recipe->id,
             'title' => $recipe->title,
+            'short_description' => $recipe->short_description,
+            'long_description' => $recipe->long_description,
+            'image_url' => url($recipe->image_url),
             'original_ingredients' => $originalIngredientSections,
             'generated_ingredients' => $aiGeneratedIngredients,
+            'instructions' => $recipe->instructions
         ]);
     }
 
@@ -146,7 +150,7 @@ class RecipeManageController extends Controller
                             \"member_name\": \"Member Name\",
                             \"section_name\": \"Section Name\",
                             \"ingredients\": [
-                                { \"id\": 1, \"name\": \"Ingredient Name\", \"amount\": \"Amount\" }
+                                { \"id\": 1, \"name\": \"Ingredient Name\", \"amount\": \"Amount in grams\" }
                                 // ...
                             ]
                         }
@@ -167,15 +171,44 @@ class RecipeManageController extends Controller
 
         $content = $response->json('choices.0.message.content') ?? null;
 
-        
+
+       
+
         $aiIngredients = null;
         if ($content) {
             $aiIngredients = json_decode($content, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
+            if (json_last_error() === JSON_ERROR_NONE && is_array($aiIngredients)) {
+                $aiIngredients = $this->groupIngredientsByMember($aiIngredients);
+            } else {
                 $aiIngredients = $content;
             }
         }
 
         return $aiIngredients;
+    }
+
+
+    protected function groupIngredientsByMember($aiIngredients)
+    {
+        $grouped = [];
+
+        foreach ($aiIngredients as $item) {
+            $memberName = $item['member_name'];
+            unset($item['member_name']);
+
+            if (!isset($grouped[$memberName])) {
+                $grouped[$memberName] = [
+                    'member_name' => $memberName,
+                    'sections' => [],
+                ];
+            }
+            $grouped[$memberName]['sections'][] = [
+                'section_name' => $item['section_name'],
+                'ingredients' => $item['ingredients'],
+            ];
+        }
+
+        // Reset array keys
+        return array_values($grouped);
     }
 }
