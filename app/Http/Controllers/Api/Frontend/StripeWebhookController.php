@@ -82,8 +82,7 @@ class StripeWebhookController extends Controller
                             'user_family_member_id' => $memberId,
                         ]);
                     }
-                    Log::warning('User subs: ' . $user_subscription);
-
+                    
 
 
                 }
