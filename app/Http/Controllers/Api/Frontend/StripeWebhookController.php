@@ -76,6 +76,7 @@ class StripeWebhookController extends Controller
                     );
 
 
+                    // user family member subscribe 
                     foreach ($memberIds as $memberId) {
                         SubscriptionFamilyMember::create([
                             'subscription_id' => $sub->id,
