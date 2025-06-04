@@ -18,6 +18,9 @@ return new class extends Migration
             $table->foreignId('user_family_member_id')->constrained()->onDelete('cascade');
             $table->string('file_path'); 
             $table->json('report_data')->nullable();
+            $table->string('trait'); 
+            $table->string('value'); 
+
 
             $table->timestamps();
         });

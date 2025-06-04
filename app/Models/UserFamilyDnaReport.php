@@ -10,6 +10,8 @@ class UserFamilyDnaReport extends Model
         'id',
         'user_family_member_id',
         'file_path',
-        'report_data'
+        'report_data',
+        'trait', 
+        'value'
     ];
 }
