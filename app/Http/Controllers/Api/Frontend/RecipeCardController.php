@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Api\Frontend;
 
+use App\Models\Order;
 use App\Models\Recipe;
 use App\Helpers\Helper;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Models\Order;
 use App\Models\OrderRecipe;
+use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Http\Controllers\Controller;
 
 class RecipeCardController extends Controller
 {
@@ -41,6 +42,7 @@ class RecipeCardController extends Controller
                         'cuisine' => optional($recipe->cuisine)->name,
                         'time_to_cook' => optional($recipe->time_to_clock)->name,
                         'health_goal' => optional($recipe->health_goal)->name,
+                        'download_url' => route('api.recipe.download', ['id' => $recipe->id]),
                     ];
                 }),
             ];
@@ -50,22 +52,127 @@ class RecipeCardController extends Controller
     }
 
 
+
+
     public function recipe_details($recipe_id)
     {
-        
-        $recipe = OrderRecipe::with([
+        $orderRecipe = OrderRecipe::with([
             'recipe.instructions',
-            'recipe.ingredientSections.ingredients'
-            ,'order.order_ingredients'
+            'recipe.ingredientSections.ingredients',
+            'order.order_ingredients.userFamilyMember'
         ])->where('recipe_id', $recipe_id)->first();
 
-        if (!$recipe) {
+        if (!$orderRecipe) {
             return Helper::jsonResponse(false, 'Recipe not found', 404, null);
         }
 
-       
+        $recipe = $orderRecipe->recipe;
 
-        return Helper::jsonResponse(true, 'Recipe Details Retrieved Successfully', 200, $recipe);
+        // General ingredients list
+        $ingredients = $recipe->ingredientSections->flatMap(function ($section) {
+            return $section->ingredients;
+        })->unique('id')->values();
+
+        // Instructions
+        $instructions = $recipe->instructions->pluck('description');
+
+        // Group order_ingredients by userFamilyMember for swap guide
+        $orderIngredients = $orderRecipe->order->order_ingredients ?? collect();
+        $swapGuide = $orderIngredients->groupBy(function ($ingredient) {
+            return optional($ingredient->userFamilyMember)->id;
+        })->map(function ($items, $familyMemberId) {
+            $familyMember = $items->first()->userFamilyMember;
+            return [
+
+                'family_member' => [
+                    'id' => $familyMember->id ?? null,
+                    'name' => $familyMember->first_name . " " . $familyMember->last_name ?? 'Unknown'
+                ],
+
+                'ingredients' => $items->map(function ($ingredient) {
+                    return [
+                        'id' => $ingredient->id,
+                        'name' => $ingredient->reason,
+                    ];
+                })->values()
+
+            ];
+        })->values();
+
+        $data = [
+            'recipe' => [
+                'id' => $recipe->id,
+                'name' => $recipe->name,
+                'image' => url($recipe->image_url),
+            ],
+            'ingredients' => $ingredients->map(function ($ingredient) {
+                return [
+                    'id' => $ingredient->id,
+                    'name' => $ingredient->name,
+                ];
+            }),
+            'instructions' => $instructions,
+            'swap_guide' => $swapGuide
+        ];
+
+        return Helper::jsonResponse(true, 'Recipe Details Retrieved Successfully', 200, $data);
     }
-    
+
+
+
+    public function download_recipe_pdf($recipe_id)
+    {
+        // Fetch recipe details as in recipe_details()
+        $orderRecipe = OrderRecipe::with([
+            'recipe.instructions',
+            'recipe.ingredientSections.ingredients',
+            'order.order_ingredients.userFamilyMember'
+        ])->where('recipe_id', $recipe_id)->first();
+
+        if (!$orderRecipe) {
+            abort(404, 'Recipe not found');
+        }
+
+        $recipe = $orderRecipe->recipe;
+        $ingredients = $recipe->ingredientSections->flatMap(function ($section) {
+            return $section->ingredients;
+        })->unique('id')->values();
+
+        $instructions = $recipe->instructions->pluck('description');
+
+        $orderIngredients = $orderRecipe->order->order_ingredients ?? collect();
+        $swapGuide = $orderIngredients->groupBy(function ($ingredient) {
+            return optional($ingredient->userFamilyMember)->id;
+        })->map(function ($items, $familyMemberId) {
+            $familyMember = $items->first()->userFamilyMember;
+            return [
+                'family_member' => [
+                    'id' => $familyMember->id ?? null,
+                    'name' => $familyMember->first_name . " " . $familyMember->last_name ?? 'Unknown'
+                ],
+                'ingredients' => $items->map(function ($ingredient) {
+                    return [
+                        'id' => $ingredient->id,
+                        'name' => $ingredient->reason,
+                    ];
+                })->values()
+            ];
+        })->values();
+
+        $pdf = Pdf::loadView('frontend.layouts.recipe', [
+            'recipe' => [
+                'name' => $recipe->name,
+                'image' => url($recipe->image_url),
+            ],
+            'ingredients' => $ingredients->map(function ($ingredient) {
+                return [
+                    'name' => $ingredient->name,
+                ];
+            }),
+            'instructions' => $instructions,
+            'swap_guide' => $swapGuide
+        ]);
+
+        return $pdf->download('recipe_' . $recipe->id . '.pdf');
+    }
 }

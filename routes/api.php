@@ -141,9 +141,11 @@ Route::middleware(['auth:api'])->controller(RecipeCardController::class)->prefix
     Route::get('/details/{recipe_id}', 'recipe_details');
     
 
-    // quiz
-    Route::post('/quiz/store', 'quizStore');
+    
 });
+
+Route::get('/download-pdf/{id}',[RecipeCardController::class, 'download_recipe_pdf'])->name('api.recipe.download');
+
 
 
 
