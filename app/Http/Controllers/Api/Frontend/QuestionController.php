@@ -43,34 +43,45 @@ class QuestionController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request->all()); // <-- REMOVE or COMMENT THIS LINE
 
-        // dd($request->all());
         $validated = $request->validate([
             'answers' => 'required|array',
             'answers.*.question_id' => 'required|exists:questions,id',
             'answers.*.answer' => 'nullable|string',
-            'answers.*.selected_option_value' => 'nullable|string',
+            'answers.*.option_value' => 'nullable', 
         ]);
 
         $submittedAnswers = [];
 
         foreach ($validated['answers'] as $answerData) {
             $question = Question::with('options')->find($answerData['question_id']);
+            // dd($question);
+
+            $answerText = null;
+            $optionValue = null;
+
+            if ($question->question_type === 'text') {
+                $answerText = $answerData['answer'] ?? null;
+                // dd($answerData);
+            } elseif ($question->question_type === 'yes_no') {
+                $optionValue = $answerData['option_value'] ?? null;
+            } elseif ($question->question_type === 'multiple_choice') {
+                // Accept both single and multiple selections
+                $optionValue = isset($answerData['option_value'])
+                    ? (is_array($answerData['option_value']) ? json_encode($answerData['option_value']) : $answerData['option_value'])
+                    : null;
+            }
 
             $userAnswer = UserAnswer::updateOrCreate(
                 [
                     'user_id' => auth('api')->user()->id,
-                    'quiz_id' => 1,
+                    'quiz_id' => $question->quiz_id,
                     'question_id' => $question->id,
                 ],
                 [
-                    'answer_text' => in_array($question->question_type, ['single_choice', 'multi_choice']) || is_numeric($answerData['answer'] ?? null)
-                        ? $answerData['answer']
-                        : null,
-
-                    'selected_option_value' => in_array($question->question_type, ['yes_no', 'multiple_choice'])
-                        ? $answerData['selected_option_value']
-                        : null,
+                    'answer_text' => $answerText,
+                    'selected_option_value' => $optionValue,
                 ]
             );
 
@@ -78,7 +89,7 @@ class QuestionController extends Controller
                 'question_id' => $question->id,
                 'question_text' => $question->question_text,
                 'question_type' => $question->question_type,
-                'answer' => $userAnswer->answer_text ?? $userAnswer->selected_option_value,
+                'answer' => $userAnswer->answer_text ?? $userAnswer->option_value,
             ];
         }
 
