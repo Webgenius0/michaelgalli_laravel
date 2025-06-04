@@ -27,4 +27,10 @@ class Order extends Model
     {
         return $this->hasMany(OrderRecipe::class, 'order_id');
     }
+
+
+    public function order_ingredients()
+    {
+        return $this->hasMany(OrderIngredient::class, 'order_id');
+    }
 }

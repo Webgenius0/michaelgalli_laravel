@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\Frontend\RecipeManageController;
 use App\Http\Controllers\Api\Frontend\SubscriptionController;
 use App\Http\Controllers\Api\Frontend\StripeWebhookController;
 use App\Http\Controllers\Api\Frontend\DeliveryAddressController;
+use App\Http\Controllers\Api\Frontend\RecipeCardController;
 use App\Http\Controllers\Api\Frontend\UserDnaReportController;
 use App\Http\Controllers\Api\Frontend\UserFamilyMemberController;
 
@@ -132,6 +133,18 @@ Route::middleware(['auth:api'])->controller(UserFamilyMemberController::class)->
     // quiz
     Route::post('/quiz/store', 'quizStore');
 });
+
+
+// user family member
+Route::middleware(['auth:api'])->controller(RecipeCardController::class)->prefix('user/recipe/card')->group(function () {
+    Route::get('/list', 'recipe_list');
+    Route::get('/details/{recipe_id}', 'recipe_details');
+    
+
+    // quiz
+    Route::post('/quiz/store', 'quizStore');
+});
+
 
 
 // user family member
