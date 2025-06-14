@@ -159,10 +159,10 @@ class RecipeCardController extends Controller
             ];
         })->values();
 
-        $pdf = Pdf::loadView('frontend.layouts.recipe', [
+        return view ('frontend.layouts.recipe', [
             'recipe' => [
-                'name' => $recipe->name,
-                'image' => url($recipe->image_url),
+                'name' => $recipe->title,
+                'image' =>$recipe->image_url,
             ],
             'ingredients' => $ingredients->map(function ($ingredient) {
                 return [
@@ -173,6 +173,8 @@ class RecipeCardController extends Controller
             'swap_guide' => $swapGuide
         ]);
 
-        return $pdf->download('recipe_' . $recipe->id . '.pdf');
+        // dd($pdf);
+
+        // return $pdf->download('recipe_' . $recipe->id . '.pdf');
     }
 }

@@ -79,6 +79,13 @@ class RegisterController extends Controller
 
 
             $data = User::select($this->select)->with('roles')->find($user->id);
+               // Generate JWT token for the user
+            $token = auth('api')->login($user);
+
+            // Add token and expires_in to the data object
+            $data->token = $token;
+            $data->expires_in = auth('api')->factory()->getTTL() * 60;
+
 
             return response()->json([
                 'status'     => true,
@@ -120,7 +127,7 @@ class RegisterController extends Controller
             $user->otp_expires_at    = null;
             $user->save();
 
-            return Helper::jsonResponse(true, 'Email verification successful.', 200,$user);
+            return Helper::jsonResponse(true, 'Email verification successful.', 200, $user);
         } catch (Exception $e) {
             return Helper::jsonErrorResponse($e->getMessage(), $e->getCode());
         }
