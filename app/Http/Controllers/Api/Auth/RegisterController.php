@@ -17,11 +17,17 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use App\Notifications\RegistrationNotification;
+use App\Traits\ApiResponse;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 
 class RegisterController extends Controller
 {
+
+    use ApiResponse;
+
+
+
     public $select;
     public function __construct()
     {
@@ -79,10 +85,8 @@ class RegisterController extends Controller
 
 
             $data = User::select($this->select)->with('roles')->find($user->id);
-               // Generate JWT token for the user
-            $token = auth('api')->login($user);
 
-            // Add token and expires_in to the data object
+            $token = auth('api')->login($user);
             $data->token = $token;
             $data->expires_in = auth('api')->factory()->getTTL() * 60;
 
@@ -158,7 +162,7 @@ class RegisterController extends Controller
             $user->save();
 
             //* Send the new OTP to the user's email
-            Mail::to($user->email)->send(new OtpMail($newOtp, $user, 'Verify Your Email Address'));
+            // Mail::to($user->email)->send(new OtpMail($newOtp, $user, 'Verify Your Email Address'));
 
             return Helper::jsonResponse(true, 'A new OTP has been sent to your email.', 200);
         } catch (Exception $e) {
