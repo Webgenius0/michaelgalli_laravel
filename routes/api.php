@@ -139,9 +139,9 @@ Route::middleware(['auth:api'])->controller(UserFamilyMemberController::class)->
 Route::middleware(['auth:api'])->controller(RecipeCardController::class)->prefix('user/recipe/card')->group(function () {
     Route::get('/list', 'recipe_list');
     Route::get('/details/{recipe_id}', 'recipe_details');
-    
 
-    
+
+
 });
 
 Route::get('/download-pdf/{id}',[RecipeCardController::class, 'download_recipe_pdf'])->name('api.recipe.download');
@@ -151,9 +151,9 @@ Route::get('/download-pdf/{id}',[RecipeCardController::class, 'download_recipe_p
 
 // user family member
 Route::middleware(['auth:api'])->controller(UserDnaReportController::class)->prefix('user/dna/report')->group(function () {
-    
+
     Route::post('/store', 'store');
-    
+
 });
 
 
@@ -164,7 +164,7 @@ Route::middleware(['auth:api'])->controller(SubscriptionController::class)->pref
     // get meal plans
     Route::get('/meal/plans', 'mealPlans');
 
-    // create , pause, cancel 
+    // create , pause, cancel
     Route::post('/subscribe', 'subscribe');
     Route::post('/pause', 'pauseSubscription');
     Route::post('/cancel', 'cancelSubscription');

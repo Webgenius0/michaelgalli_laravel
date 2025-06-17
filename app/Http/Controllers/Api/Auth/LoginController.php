@@ -16,13 +16,13 @@ class LoginController extends Controller
     public $select;
     public function __construct()
     {
-        $this->select = ['id', 'first_name','last_name', 'email', 'avatar'];   
+        $this->select = ['id', 'first_name','last_name', 'email', 'avatar'];
     }
 
     public function Login(Request $request)
     {
         try {
-            
+
             $validator = Validator::make($request->all(), [
                 'email'    => 'required|email|exists:users,email',
                 'password' => 'required|string|min:6',
@@ -44,12 +44,12 @@ class LoginController extends Controller
                 return Helper::jsonResponse(false, 'user is not active', 404);
             }
 
-            //! Check the password
+            // Check the password
             if (!Hash::check($request->password, $user->password)) {
-                return Helper::jsonResponse(false, 'Invalid password', 401);
+                return Helper::jsonResponse(false, 'Invalid password', 422);
             }
-            
-            //? Check if the email is verified before login is successful
+
+            // Check if the email is verified before login is successful
             if (!$user->otp_verified_at) {
                 return Helper::jsonResponse(false, 'Email not verified. Please verify your email before logging in.', 403);
             }else{
