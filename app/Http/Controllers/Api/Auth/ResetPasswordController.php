@@ -20,7 +20,7 @@ class ResetPasswordController extends Controller
     public $select;
     public function __construct()
     {
-        $this->select = ['id', 'name', 'email', 'avatar'];   
+        $this->select = ['id', 'name', 'email', 'avatar'];
     }
     public function forgotPassword(Request $request)
     {
@@ -34,13 +34,13 @@ class ResetPasswordController extends Controller
             $user  = User::where('email', $email)->first();
 
             if ($user) {
-                Mail::to($email)->send(new OtpMail($otp, $user, 'Reset Your Password'));
+                // Mail::to($email)->send(new OtpMail($otp, $user, 'Reset Your Password'));
 
                 $user->otp            = $otp;
                 $user->otp_expires_at = Carbon::now()->addMinutes(10);
                 $user->save();
 
-                return Helper::jsonResponse(true, 'OTP Code Sent Successfully Please Check Your Email.', 200);
+                return Helper::jsonResponse($user, 'OTP Code Sent Successfully Please Check Your Email.', 200);
             } else {
                 return Helper::jsonErrorResponse('Invalid Email Address', 404);
             }
@@ -56,7 +56,7 @@ class ResetPasswordController extends Controller
             'email' => 'required|email|exists:users,email',
             'otp'   => 'required|digits:6',
         ]);
-        
+
         try {
             $email = $request->input('email');
             $otp   = $request->input('otp');
@@ -110,7 +110,7 @@ class ResetPasswordController extends Controller
             }
 
             if (!empty($user->reset_password_token) && $user->reset_password_token === $request->token && $user->reset_password_token_expire_at >= Carbon::now()) {
-                
+
                 $user->password = Hash::make($newPassword);
                 $user->reset_password_token = null;
                 $user->reset_password_token_expire_at = null;
