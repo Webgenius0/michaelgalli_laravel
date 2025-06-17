@@ -1,22 +1,20 @@
 <?php
-
 namespace App\Http\Controllers\Api\Auth;
 
-use App\Http\Controllers\Controller;
 use App\Helpers\Helper;
-use App\Mail\OtpMail;
+use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Traits\ApiResponse;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class ResetPasswordController extends Controller
 {
+    use ApiResponse;
+
     public $select;
     public function __construct()
     {
@@ -30,7 +28,7 @@ class ResetPasswordController extends Controller
         try {
 
             $email = $request->input('email');
-            $otp   = rand(100000, 999999);
+            $otp   = rand(1000, 9999);
             $user  = User::where('email', $email)->first();
 
             if ($user) {
@@ -40,9 +38,10 @@ class ResetPasswordController extends Controller
                 $user->otp_expires_at = Carbon::now()->addMinutes(10);
                 $user->save();
 
-                return Helper::jsonResponse($user, 'OTP Code Sent Successfully Please Check Your Email.', 200);
+                return $this->success($user, 'OTP sent successfully to your email.');
+
             } else {
-                return Helper::jsonErrorResponse('Invalid Email Address', 404);
+                // return Helper::jsonErrorResponse('Invalid Email Address', 404);
             }
 
         } catch (Exception $e) {
@@ -60,10 +59,10 @@ class ResetPasswordController extends Controller
         try {
             $email = $request->input('email');
             $otp   = $request->input('otp');
-            $user = User::where('email', $email)->first();
+            $user  = User::where('email', $email)->first();
 
-            if (!$user) {
-                return Helper::jsonErrorResponse( 'User not found', 404);
+            if (! $user) {
+                return Helper::jsonErrorResponse('User not found', 404);
             }
 
             if (Carbon::parse($user->otp_expires_at)->isPast()) {
@@ -75,18 +74,18 @@ class ResetPasswordController extends Controller
             }
             $token = Str::random(120);
 
-            $user->otp = null;
-            $user->otp_expires_at = null;
-            $user->reset_password_token = $token;
+            $user->otp                            = null;
+            $user->otp_expires_at                 = null;
+            $user->reset_password_token           = $token;
             $user->reset_password_token_expire_at = Carbon::now()->addHour();
 
             $user->save();
 
             return response()->json([
-                'status'     => true,
-                'message'    => 'OTP verified successfully.',
-                'code'       => 200,
-                'token'      => $token,
+                'status'  => true,
+                'message' => 'OTP verified successfully.',
+                'code'    => 200,
+                'token'   => $token,
             ]);
         } catch (Exception $e) {
             return Helper::jsonErrorResponse($e->getMessage(), 500);
@@ -105,20 +104,20 @@ class ResetPasswordController extends Controller
             $newPassword = $request->input('password');
 
             $user = User::where('email', $email)->first();
-            if (!$user) {
-                return Helper::jsonErrorResponse( 'User not found', 404);
+            if (! $user) {
+                return Helper::jsonErrorResponse('User not found', 404);
             }
 
-            if (!empty($user->reset_password_token) && $user->reset_password_token === $request->token && $user->reset_password_token_expire_at >= Carbon::now()) {
+            if (! empty($user->reset_password_token) && $user->reset_password_token === $request->token && $user->reset_password_token_expire_at >= Carbon::now()) {
 
-                $user->password = Hash::make($newPassword);
-                $user->reset_password_token = null;
+                $user->password                       = Hash::make($newPassword);
+                $user->reset_password_token           = null;
                 $user->reset_password_token_expire_at = null;
 
                 $user->save();
 
                 return Helper::jsonResponse(true, 'Password reset successfully.', 200);
-            }else{
+            } else {
                 return Helper::jsonErrorResponse('Invalid Token', 419);
             }
 
