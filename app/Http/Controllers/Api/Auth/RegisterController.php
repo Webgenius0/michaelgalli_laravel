@@ -52,7 +52,7 @@ class RegisterController extends Controller
                 'phone_number'           => $request->input('phone_number'),
                 'email'          => strtolower($request->input('email')),
                 'password'       => Hash::make($request->input('password')),
-                'otp'            => rand(100000, 999999),
+                'otp'            => rand(1000, 9999),
                 'otp_expires_at' => Carbon::now()->addMinutes(10),
             ]);
 
