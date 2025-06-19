@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\Frontend\SubscriptionController;
 use App\Http\Controllers\Api\Frontend\StripeWebhookController;
 use App\Http\Controllers\Api\Frontend\DeliveryAddressController;
 use App\Http\Controllers\Api\Frontend\RecipeCardController;
+use App\Http\Controllers\Api\Frontend\RecipeFilterController;
 use App\Http\Controllers\Api\Frontend\UserDnaReportController;
 use App\Http\Controllers\Api\Frontend\UserFamilyMemberController;
 
@@ -47,6 +48,18 @@ Route::get('/question/list', [QuestionController::class, 'index']);
 
 Route::get('/recipe/list', [RecipeManageController::class, 'recipe_list']);
 Route::get('/recipe/details/{id}', [RecipeManageController::class, 'recipe_details']);
+
+
+Route::get('/category/list', [RecipeFilterController::class, 'category_list']);
+Route::get('/protein/list', [RecipeFilterController::class, 'protein_list']);
+// calories, carbs, cuisine , health_goal, time_to_cook
+Route::get('/calories/list', [RecipeFilterController::class, 'calories_list']);
+Route::get('/carbs/list', [RecipeFilterController::class, 'carbs_list']);
+Route::get('/cuisine/list', [RecipeFilterController::class, 'cuisine_list']);
+Route::get('/health_goal/list', [RecipeFilterController::class, 'health_goal_list']);
+Route::get('/time_to_cook/list', [RecipeFilterController::class, 'time_to_cook_list']);
+
+
 
 
 
