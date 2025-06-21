@@ -9,13 +9,16 @@ class Recipe extends Model
     protected $guarded = ['id'];
 
 
+    // imagegeturl
+
+
     public function ingredientSections()
     {
         return $this->hasMany(IngredientSection::class);
     }
 
 
-    // instructions 
+    // instructions
 
     public function instructions()
     {

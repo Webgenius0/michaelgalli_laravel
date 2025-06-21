@@ -1,18 +1,18 @@
 <?php
-
-
 namespace App\Http\Controllers\Api\Frontend;
 
-use App\Models\Recipe;
 use App\Helpers\Helper;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Recipe;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
 class RecipeManageController extends Controller
 {
     public function recipe_list(Request $request)
     {
+        $perPage = $request->input('per_page', 10);
+
         $recipes = Recipe::with([
             'protein',
             'calory',
@@ -63,16 +63,32 @@ class RecipeManageController extends Controller
             }
         });
 
-        $list = $recipes->orderBy('created_at', 'desc')->get();
+        $paginated = $recipes->orderBy('created_at', 'desc')->paginate($perPage);
 
-        return Helper::jsonResponse(true, 'Recipe List Retrive Successfully', 200, $list);
+        $data = [
+            'data' => collect($paginated->items())->map(function ($item) {
+                $item->image_url = $item->image_url
+                ? asset( $item->image_url)
+                : null;
+
+                return $item;
+            }),
+            'meta' => [
+                'current_page' => $paginated->currentPage(),
+                'last_page'    => $paginated->lastPage(),
+                'per_page'     => $paginated->perPage(),
+                'total'        => $paginated->total(),
+            ],
+        ];
+
+        return Helper::jsonResponse(true, 'Recipe List Retrieved Successfully', 200, $data);
     }
 
     public function recipe_details(Request $request, $id)
     {
 
         $recipe = Recipe::with(['ingredientSections.ingredients', 'instructions'])->find($id);
-        if (!$recipe) {
+        if (! $recipe) {
             return response()->json(['success' => false, 'message' => 'Recipe not found'], 404);
         }
 
@@ -80,7 +96,7 @@ class RecipeManageController extends Controller
         $originalIngredientSections = $recipe->ingredientSections->map(function ($section) {
             return [
                 'section_name' => $section->title,
-                'ingredients' => $section->ingredients->map(fn($ing) => ['id' => $ing->id, 'name' => $ing->name, 'amount' => $ing->amount])
+                'ingredients'  => $section->ingredients->map(fn($ing) => ['id' => $ing->id, 'name' => $ing->name, 'amount' => $ing->amount]),
             ];
         });
 
@@ -88,7 +104,7 @@ class RecipeManageController extends Controller
 
         $aiGeneratedIngredients = null;
 
-        if (!empty($memberIds)) {
+        if (! empty($memberIds)) {
             $members = auth('api')->user()->familyMembers()->whereIn('id', $memberIds)->get();
             // dd($members);
 
@@ -100,18 +116,17 @@ class RecipeManageController extends Controller
         }
 
         return response()->json([
-            'success' => true,
-            'id' => $recipe->id,
-            'title' => $recipe->title,
-            'short_description' => $recipe->short_description,
-            'long_description' => $recipe->long_description,
-            'image_url' => url($recipe->image_url),
-            'original_ingredients' => $originalIngredientSections,
+            'success'               => true,
+            'id'                    => $recipe->id,
+            'title'                 => $recipe->title,
+            'short_description'     => $recipe->short_description,
+            'long_description'      => $recipe->long_description,
+            'image_url'             => url($recipe->image_url),
+            'original_ingredients'  => $originalIngredientSections,
             'generated_ingredients' => $aiGeneratedIngredients,
-            'instructions' => $recipe->instructions
+            'instructions'          => $recipe->instructions,
         ]);
     }
-
 
     protected function generateAiPersonalizedIngredients($recipe, $members)
     {
@@ -119,12 +134,12 @@ class RecipeManageController extends Controller
 
         $memberProfiles = $members->map(function ($member) {
             return [
-                'member_id' => $member->id,
+                'member_id'   => $member->id,
                 'member_name' => $member->first_name ?? null,
-                'answers' => $member->userAnswers->map(function ($answer) {
+                'answers'     => $member->userAnswers->map(function ($answer) {
                     return [
-                        'question_id' => $answer->question_id,
-                        'answer_text' => $answer->answer_text,
+                        'question_id'           => $answer->question_id,
+                        'answer_text'           => $answer->answer_text,
                         'selected_option_value' => $answer->selected_option_value,
                     ];
                 })->toArray(),
@@ -190,12 +205,12 @@ class RecipeManageController extends Controller
                     ";
 
         $response = Http::withToken(env('OPENAI_API_KEY'))->post('https://api.openai.com/v1/chat/completions', [
-            'model' => 'gpt-4',
-            'messages' => [
+            'model'       => 'gpt-4',
+            'messages'    => [
                 ['role' => 'system', 'content' => 'You are a meal planning assistant.'],
-                ['role' => 'user', 'content' => $prompt]
+                ['role' => 'user', 'content' => $prompt],
             ],
-            'max_tokens' => 1000,
+            'max_tokens'  => 1000,
             'temperature' => 0.7,
         ]);
 
@@ -214,7 +229,6 @@ class RecipeManageController extends Controller
         return $aiIngredients;
     }
 
-
     protected function groupIngredientsByMember($aiIngredients)
     {
         $grouped = [];
@@ -223,15 +237,15 @@ class RecipeManageController extends Controller
             $memberName = $item['member_name'];
             unset($item['member_name']);
 
-            if (!isset($grouped[$memberName])) {
+            if (! isset($grouped[$memberName])) {
                 $grouped[$memberName] = [
                     'member_name' => $memberName,
-                    'sections' => [],
+                    'sections'    => [],
                 ];
             }
             $grouped[$memberName]['sections'][] = [
                 'section_name' => $item['section_name'],
-                'ingredients' => $item['ingredients'],
+                'ingredients'  => $item['ingredients'],
             ];
         }
 
