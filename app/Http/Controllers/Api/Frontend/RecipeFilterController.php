@@ -25,7 +25,7 @@ class RecipeFilterController extends Controller
             ->get();
 
         if ($categories->isEmpty()) {
-            return $this->error([], 'No categories Found', 404);
+            return $this->success([], 'No categories Found', 200);
         }
 
         return $this->success($categories, 'Category List Retrieved Successfully');
@@ -39,7 +39,7 @@ class RecipeFilterController extends Controller
             ->get();
 
         if ($proteins->isEmpty()) {
-            return $this->error([], 'No proteins Found', 404);
+            return $this->success([], 'No proteins Found', 202);
         }
 
         return $this->success($proteins, 'Protein List Retrieved Successfully');
@@ -53,7 +53,7 @@ class RecipeFilterController extends Controller
             ->get();
 
         if ($calories->isEmpty()) {
-            return $this->error([], 'No proteins Found', 404);
+            return $this->success([], 'No proteins Found', 202);
         }
 
         return $this->success($calories, 'Calories List Retrieved Successfully');
@@ -67,7 +67,7 @@ class RecipeFilterController extends Controller
             ->get();
 
         if ($carbs->isEmpty()) {
-            return $this->error([], 'No carbs Found', 404);
+            return $this->success([], 'No carbs Found', 202);
         }
 
         return $this->success($carbs, 'Carbs List Retrieved Successfully');
@@ -81,7 +81,7 @@ class RecipeFilterController extends Controller
             ->get();
 
         if ($cuisines->isEmpty()) {
-            return $this->error([], 'No cuisines Found', 404);
+            return $this->success([], 'No cuisines Found', 202);
         }
 
         return $this->success($cuisines, 'Cuisine List Retrieved Successfully');
@@ -95,7 +95,7 @@ class RecipeFilterController extends Controller
             ->get();
 
         if ($health_goals->isEmpty()) {
-            return $this->error([], 'No health goals Found', 404);
+            return $this->success([], 'No health goals Found', 202);
         }
 
         return $this->success($health_goals, 'Health Goal List Retrieved Successfully');
