@@ -21,7 +21,23 @@ class UserProfileController extends Controller
         }
         // Append additional attributes if needed
 
-        return $this->success($user, 'User profile retrieved successfully');
+
+        $data = [
+            'id'           => $user->id,
+            'email'        => $user->email,
+            'avatar'       => $user->avatar ? url($user->avatar) : '',
+            'first_name'   => $user->first_name,
+            'last_name'    => $user->last_name,
+            'phone_number' => $user->phone_number,
+            'age'          => $user->age,
+            'height'       => $user->height,
+            'weight'       => $user->weight,
+            'delivery_address' => $user->deliveryAddresses
+        ];
+
+
+
+        return $this->success($data, 'User profile retrieved successfully');
     }
 
     // update user profile
