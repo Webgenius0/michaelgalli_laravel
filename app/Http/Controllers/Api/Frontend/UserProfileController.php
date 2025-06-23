@@ -134,7 +134,7 @@ class UserProfileController extends Controller
         }
         $validator = Validator::make($request->all(), [
             'current_password' => 'required|string|min:8',
-            'new_password'     => 'required|string|min:8|confirmed',
+            'new_password'     => 'required|string|min:8',
         ]);
         if ($validator->fails()) {
             return $this->error([], $validator->errors()->first(), 422);
