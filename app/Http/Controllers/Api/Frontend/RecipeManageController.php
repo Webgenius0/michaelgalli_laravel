@@ -24,6 +24,10 @@ class RecipeManageController extends Controller
             'health_goal',
         ]);
 
+        $recipes->when($request->filled('category_id'), function ($query) use ($request) {
+            $query->where('category_id', $request->category_id);
+        });
+
         $recipes->when($request->filled('protein_id'), function ($query) use ($request) {
             $query->where('protein_id', $request->protein_id);
         });
