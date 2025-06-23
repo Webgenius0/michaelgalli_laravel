@@ -107,4 +107,30 @@ class UserProfileController extends Controller
         return $this->success($data, 'Profile Updated successfully ', 200);
     }
 
+
+    // change password
+    public function changePassword(Request $request)
+    {
+
+        $user = auth('api')->user();
+        if (! $user) {
+            return $this->error([], 'User not found', 404);
+        }
+        $validator = Validator::make($request->all(), [
+            'current_password' => 'required|string|min:8',
+            'new_password'     => 'required|string|min:8|confirmed',
+        ]);
+        if ($validator->fails()) {
+            return $this->error([], $validator->errors()->first(), 422);
+        }
+        if (! password_verify($request->current_password, $user->password)) {
+            return $this->error([], 'Current password is incorrect', 422);
+        }
+        $user->update([
+            'password' => bcrypt($request->new_password),
+        ]);
+        return $this->success([], 'Password changed successfully', 200);
+
+    }
+
 }

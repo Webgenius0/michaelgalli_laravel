@@ -11,6 +11,7 @@ class RecipeSeeder extends Seeder
 {
     public function run(): void
     {
+        // Existing four recipes
         $this->createRecipe(
             title: 'Prawns with Cauli Mash',
             shortDescription: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
@@ -165,8 +166,167 @@ class RecipeSeeder extends Seeder
             ]
         );
 
+        // New 6 recipes
+        $this->createRecipe(
+            title: 'Beef Stir‑Fry with Broccoli',
+            shortDescription: 'Quick and flavorful beef stir‑fry with crisp-tender broccoli.',
+            imageUrl: 'https://images.unsplash.com/photo-1589308078056-f825b9b47cc4?auto=format&fit=crop&w=800&q=80',
+            sections: [
+                [
+                    'title' => '1 Prep',
+                    'order' => 1,
+                    'ingredients' => [
+                        ['name' => 'Beef sirloin', 'amount' => '400 grams', 'is_highlighted' => true],
+                        ['name' => 'Broccoli florets', 'amount' => '300 grams', 'is_highlighted' => true],
+                        ['name' => 'Garlic', 'amount' => '3 cloves'],
+                        ['name' => 'Soy sauce', 'amount' => '3 Tbsp', 'is_highlighted' => true],
+                        ['name' => 'Sesame oil', 'amount' => '1 Tbsp'],
+                    ],
+                ],
+            ],
+            instructions: [
+                ['step_number' => 1, 'title' => 'Marinate Beef', 'description' => 'Slice beef thinly and marinate with soy sauce and garlic for 10 minutes.'],
+                ['step_number' => 2, 'title' => 'Cook Broccoli', 'description' => 'Blanch broccoli in boiling water for 2 minutes, then drain.'],
+                ['step_number' => 3, 'title' => 'Stir‑Fry', 'description' => 'Heat sesame oil, stir fry beef until nearly cooked, add broccoli and toss together 2 minutes.'],
+                ['step_number' => 4, 'title' => 'Serve', 'description' => 'Plate immediately over rice or noodles.'],
+            ]
+        );
 
-        // You can add more recipes similarly...
+        $this->createRecipe(
+            title: 'Salmon with Asparagus & Lemon Butter',
+            shortDescription: 'Oven‑baked salmon with tender asparagus and zesty lemon butter.',
+            imageUrl: 'https://images.unsplash.com/photo-1514516875663-0e06eff7b808?auto=format&fit=crop&w=800&q=80',
+            sections: [
+                [
+                    'title' => '1 Prep',
+                    'order' => 1,
+                    'ingredients' => [
+                        ['name' => 'Salmon fillets', 'amount' => '2 × 200g', 'is_highlighted' => true],
+                        ['name' => 'Asparagus', 'amount' => '250 grams', 'is_highlighted' => true],
+                        ['name' => 'Butter', 'amount' => '2 Tbsp', 'is_highlighted' => true],
+                        ['name' => 'Lemon', 'amount' => '1 Piece'],
+                    ],
+                ],
+            ],
+            instructions: [
+                ['step_number' => 1, 'title' => 'Prepare Salmon', 'description' => 'Preheat oven to 200°C. Place salmon and asparagus on a tray, season with salt and pepper.'],
+                ['step_number' => 2, 'title' => 'Make Lemon Butter', 'description' => 'Melt butter, mix in lemon juice and zest.'],
+                ['step_number' => 3, 'title' => 'Bake', 'description' => 'Drizzle lemon butter over salmon and asparagus. Bake 12–15 minutes until salmon is done.'],
+            ]
+        );
+
+        $this->createRecipe(
+            title: 'Veggie Tacos with Black Bean Salsa',
+            shortDescription: 'Colorful tacos filled with roasted veggies and a zesty black bean salsa.',
+            imageUrl: 'https://images.unsplash.com/photo-1601924578312-2c489193415d?auto=format&fit=crop&w=800&q=80',
+            sections: [
+                [
+                    'title' => '1 Prep',
+                    'order' => 1,
+                    'ingredients' => [
+                        ['name' => 'Corn tortillas', 'amount' => '8 pieces'],
+                        ['name' => 'Bell peppers', 'amount' => '2 mixed', 'is_highlighted' => true],
+                        ['name' => 'Zucchini', 'amount' => '1 large', 'is_highlighted' => true],
+                        ['name' => 'Cumin', 'amount' => '1 tsp'],
+                    ],
+                ],
+                [
+                    'title' => 'Black Bean Salsa',
+                    'order' => 2,
+                    'ingredients' => [
+                        ['name' => 'Black beans', 'amount' => '400 grams', 'is_highlighted' => true],
+                        ['name' => 'Red onion', 'amount' => '½ Piece'],
+                        ['name' => 'Cilantro', 'amount' => 'handful'],
+                        ['name' => 'Lime', 'amount' => '1 Piece', 'is_highlighted' => true],
+                    ],
+                ],
+            ],
+            instructions: [
+                ['step_number' => 1, 'title' => 'Roast Veggies', 'description' => 'Slice peppers and zucchini, toss with oil, cumin, salt, roast 15 minutes at 200°C.'],
+                ['step_number' => 2, 'title' => 'Make Salsa', 'description' => 'Combine beans, diced onion, cilantro and lime juice.'],
+                ['step_number' => 3, 'title' => 'Warm Tortillas', 'description' => 'Warm tortillas in a dry skillet.'],
+                ['step_number' => 4, 'title' => 'Assemble Tacos', 'description' => 'Fill tacos with roasted veggies, top with black bean salsa.'],
+            ]
+        );
+
+        $this->createRecipe(
+            title: 'Shrimp & Avocado Salad',
+            shortDescription: 'Light and refreshing shrimp salad perfect for warm days.',
+            imageUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
+            sections: [
+                [
+                    'title' => '1 Prep',
+                    'order' => 1,
+                    'ingredients' => [
+                        ['name' => 'Cooked shrimp', 'amount' => '300 grams', 'is_highlighted' => true],
+                        ['name' => 'Avocado', 'amount' => '2 Pieces', 'is_highlighted' => true],
+                        ['name' => 'Cherry tomatoes', 'amount' => '150 grams'],
+                        ['name' => 'Mixed greens', 'amount' => '100 grams'],
+                    ],
+                ],
+                [
+                    'title' => 'Dressing',
+                    'order' => 2,
+                    'ingredients' => [
+                        ['name' => 'Olive oil', 'amount' => '3 Tbsp'],
+                        ['name' => 'Lime juice', 'amount' => '2 Tbsp', 'is_highlighted' => true],
+                        ['name' => 'Honey', 'amount' => '1 tsp'],
+                    ],
+                ],
+            ],
+            instructions: [
+                ['step_number' => 1, 'title' => 'Prepare Salad', 'description' => 'Slice avocado, halve tomatoes, combine with shrimp and greens.'],
+                ['step_number' => 2, 'title' => 'Make Dressing', 'description' => 'Whisk olive oil, lime juice, honey, salt and pepper.'],
+                ['step_number' => 3, 'title' => 'Toss and Serve', 'description' => 'Pour dressing over salad and toss gently.'],
+            ]
+        );
+
+        $this->createRecipe(
+            title: 'Pork Tenderloin with Apple Chutney',
+            shortDescription: 'Juicy pork tenderloin served with a sweet and tangy apple chutney.',
+            imageUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
+            sections: [
+                [
+                    'title' => '1 Prep',
+                    'order' => 1,
+                    'ingredients' => [
+                        ['name' => 'Pork tenderloin', 'amount' => '500 grams', 'is_highlighted' => true],
+                        ['name' => 'Apple', 'amount' => '2 Pieces', 'is_highlighted' => true],
+                        ['name' => 'Onion', 'amount' => '1 Piece'],
+                        ['name' => 'Apple cider vinegar', 'amount' => '2 Tbsp', 'is_highlighted' => true],
+                    ],
+                ],
+            ],
+            instructions: [
+                ['step_number' => 1, 'title' => 'Cook Pork', 'description' => 'Season tenderloin, sear all sides in a hot pan, then finish in oven at 180°C for 15 mins.'],
+                ['step_number' => 2, 'title' => 'Make Chutney', 'description' => 'Dice apples and onion, simmer with vinegar, sugar and spice until soft.'],
+                ['step_number' => 3, 'title' => 'Serve', 'description' => 'Slice pork and spoon apple chutney over top.'],
+            ]
+        );
+
+        $this->createRecipe(
+            title: 'Vegetable Risotto',
+            shortDescription: 'Creamy risotto loaded with seasonal vegetables and Parmesan.',
+            imageUrl: 'https://images.unsplash.com/photo-1523986371872-9d3ba2e2f4b?auto=format&fit=crop&w=800&q=80',
+            sections: [
+                [
+                    'title' => '1 Prep',
+                    'order' => 1,
+                    'ingredients' => [
+                        ['name' => 'Arborio rice', 'amount' => '300 grams', 'is_highlighted' => true],
+                        ['name' => 'Vegetable broth', 'amount' => '1 liter'],
+                        ['name' => 'Zucchini', 'amount' => '1 Piece'],
+                        ['name' => 'Peas', 'amount' => '100 grams'],
+                        ['name' => 'Parmesan cheese', 'amount' => '50 grams', 'is_highlighted' => true],
+                    ],
+                ],
+            ],
+            instructions: [
+                ['step_number' => 1, 'title' => 'Sauté Veggies', 'description' => 'Sauté zucchini in olive oil until soft.'],
+                ['step_number' => 2, 'title' => 'Cook Rice', 'description' => 'Add rice, toast 2 mins. Gradually ladle broth, stirring often until creamy.'],
+                ['step_number' => 3, 'title' => 'Finish and Serve', 'description' => 'Stir in peas and Parmesan, season, then serve warm.'],
+            ]
+        );
     }
 
     private function createRecipe(string $title, string $shortDescription, string $imageUrl, array $sections, array $instructions)

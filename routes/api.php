@@ -132,6 +132,9 @@ Route::middleware(['auth:api'])->controller(UserProfileController::class)->prefi
     Route::get('/show', 'index');
     Route::post('/update', 'update');
     Route::post('/avatar/update', 'profile_update');
+
+    // change password
+    Route::post('/change-password', 'changePassword');
 });
 
 
