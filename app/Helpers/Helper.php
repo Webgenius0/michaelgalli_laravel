@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Helpers;
 
 use Exception;
@@ -15,15 +14,32 @@ class Helper
     //! File or Image Upload
     public static function fileUpload($file, string $folder, string $name): ?string
     {
-        if (!$file->isValid()) {
+        if (! $file->isValid()) {
             return null;
         }
 
         $imageName = Str::slug($name) . '.' . $file->extension();
         $path      = public_path('uploads/' . $folder);
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             mkdir($path, 0777, true);
         }
+        $file->move($path, $imageName);
+        return 'uploads/' . $folder . '/' . $imageName;
+    }
+
+    public static function uploadImage($file, $folder)
+    {
+        if (! $file->isValid()) {
+            return null;
+        }
+
+        $imageName = time() . '-' . Str::random(5) . '.' . $file->extension(); // Unique name
+        $path      = public_path('uploads/' . $folder);
+
+        if (! file_exists($path)) {
+            mkdir($path, 0755, true);
+        }
+
         $file->move($path, $imageName);
         return 'uploads/' . $folder . '/' . $imageName;
     }
@@ -55,35 +71,35 @@ class Helper
             'message' => $message,
             'code'    => $code,
         ];
-        if ($paginate && !empty($paginateData)) {
-            $response['data'] = $data;
+        if ($paginate && ! empty($paginateData)) {
+            $response['data']       = $data;
             $response['pagination'] = [
-                'current_page' => $paginateData->currentPage(),
-                'last_page' => $paginateData->lastPage(),
-                'per_page' => $paginateData->perPage(),
-                'total' => $paginateData->total(),
+                'current_page'   => $paginateData->currentPage(),
+                'last_page'      => $paginateData->lastPage(),
+                'per_page'       => $paginateData->perPage(),
+                'total'          => $paginateData->total(),
                 'first_page_url' => $paginateData->url(1),
-                'last_page_url' => $paginateData->url($paginateData->lastPage()),
-                'next_page_url' => $paginateData->nextPageUrl(),
-                'prev_page_url' => $paginateData->previousPageUrl(),
-                'from' => $paginateData->firstItem(),
-                'to' => $paginateData->lastItem(),
-                'path' => $paginateData->path(),
+                'last_page_url'  => $paginateData->url($paginateData->lastPage()),
+                'next_page_url'  => $paginateData->nextPageUrl(),
+                'prev_page_url'  => $paginateData->previousPageUrl(),
+                'from'           => $paginateData->firstItem(),
+                'to'             => $paginateData->lastItem(),
+                'path'           => $paginateData->path(),
             ];
-        } elseif ($paginate && !empty($data)) {
-            $response['data'] = $data->items();
+        } elseif ($paginate && ! empty($data)) {
+            $response['data']       = $data->items();
             $response['pagination'] = [
-                'current_page' => $data->currentPage(),
-                'last_page' => $data->lastPage(),
-                'per_page' => $data->perPage(),
-                'total' => $data->total(),
+                'current_page'   => $data->currentPage(),
+                'last_page'      => $data->lastPage(),
+                'per_page'       => $data->perPage(),
+                'total'          => $data->total(),
                 'first_page_url' => $data->url(1),
-                'last_page_url' => $data->url($data->lastPage()),
-                'next_page_url' => $data->nextPageUrl(),
-                'prev_page_url' => $data->previousPageUrl(),
-                'from' => $data->firstItem(),
-                'to' => $data->lastItem(),
-                'path' => $data->path(),
+                'last_page_url'  => $data->url($data->lastPage()),
+                'next_page_url'  => $data->nextPageUrl(),
+                'prev_page_url'  => $data->previousPageUrl(),
+                'from'           => $data->firstItem(),
+                'to'             => $data->lastItem(),
+                'path'           => $data->path(),
             ];
         } elseif ($data !== null) {
             $response['data'] = $data;
@@ -95,10 +111,10 @@ class Helper
     public static function jsonErrorResponse(string $message, int $code = 400, array $errors = []): JsonResponse
     {
         $response = [
-            'status'  => false,
-            'message' => $message,
-            'code'    => $code,
-            't-errors'  => $errors,
+            'status'   => false,
+            'message'  => $message,
+            'code'     => $code,
+            't-errors' => $errors,
         ];
         return response()->json($response, $code);
     }
@@ -106,10 +122,10 @@ class Helper
     public static function sendNotifyMobile($token, $notifyData): void
     {
         try {
-            $factory = (new Factory)->withServiceAccount(storage_path(config('firebase.credentials')));
-            $messaging = $factory->createMessaging();
+            $factory      = (new Factory)->withServiceAccount(storage_path(config('firebase.credentials')));
+            $messaging    = $factory->createMessaging();
             $notification = Notification::create($notifyData['title'], Str::limit($notifyData['body'], 100), $notifyData['icon']);
-            $message = CloudMessage::withTarget('token', $token)->withNotification($notification);
+            $message      = CloudMessage::withTarget('token', $token)->withNotification($notification);
             $messaging->send($message);
         } catch (Exception $exception) {
             Log::error($exception->getMessage());

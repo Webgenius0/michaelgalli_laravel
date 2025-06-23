@@ -36,6 +36,7 @@ class User extends Authenticatable implements JWTSubject
     protected $fillable = [
         'first_name',
         'last_name',
+        'avatar',
         'phone_number',
         'email',
         'password',
@@ -164,5 +165,5 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Order::class, 'user_id', 'id');
     }
-    
+
 }

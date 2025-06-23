@@ -129,8 +129,9 @@ Route::middleware(['auth:api'])->controller(DeliveryAddressController::class)->p
 
 // user profile
 Route::middleware(['auth:api'])->controller(UserProfileController::class)->prefix('user/profile')->group(function () {
-    Route::get('/list', 'index');
+    Route::get('/show', 'index');
     Route::post('/update', 'update');
+    Route::post('/avatar/update', 'profile_update');
 });
 
 
