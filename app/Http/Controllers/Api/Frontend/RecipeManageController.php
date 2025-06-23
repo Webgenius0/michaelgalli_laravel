@@ -11,6 +11,7 @@ class RecipeManageController extends Controller
 {
     public function recipe_list(Request $request)
     {
+        // dd($request->all());
         $perPage = $request->input('per_page', 10);
 
         $recipes = Recipe::with([
@@ -40,6 +41,10 @@ class RecipeManageController extends Controller
 
         $recipes->when($request->filled('health_goal_id'), function ($query) use ($request) {
             $query->where('health_goal_id', $request->health_goal_id);
+        });
+
+        $recipes->when($request->filled('time_to_clock_id'), function ($query) use ($request) {
+            $query->where('time_to_clock_id', $request->time_to_clock_id);
         });
 
         $recipes->where(function ($query) use ($request) {
