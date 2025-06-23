@@ -22,6 +22,8 @@ class RecipeManageController extends Controller
             'cuisine',
             'time_to_clock',
             'health_goal',
+            'ingredientSections.ingredients',
+             'instructions'
         ]);
 
         $recipes->when($request->filled('category_id'), function ($query) use ($request) {
