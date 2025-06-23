@@ -148,7 +148,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function deliveryAddresses()
     {
-        return $this->hasMany(DeliveryAddress::class, 'user_id', 'id');
+        return $this->hasOne(DeliveryAddress::class, 'user_id', 'id');
     }
 
     public function subscriptions()

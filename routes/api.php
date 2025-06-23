@@ -204,16 +204,6 @@ Route::middleware(['auth:api'])->controller(FirebaseTokenController::class)->pre
     Route::post("token/delete", "deleteToken");
 })->middleware('auth:api');
 
-
-
-
-
-
-
-
-
-
-
 /*
 # In App Notification Route
 */
