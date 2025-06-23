@@ -15,6 +15,7 @@ class RecipeManageController extends Controller
         $perPage = $request->input('per_page', 10);
 
         $recipes = Recipe::with([
+            'category',
             'protein',
             'calory',
             'carb',

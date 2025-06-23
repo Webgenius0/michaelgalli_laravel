@@ -20,6 +20,12 @@ class Recipe extends Model
 
     // instructions
 
+
+    public function category()
+    {
+        return $this->hasMany(category::class);
+    }
+
     public function instructions()
     {
         return $this->hasMany(RecipeInstruction::class);
