@@ -133,7 +133,7 @@ class RecipeManageController extends Controller
             'title'                 => $recipe->title,
             'short_description'     => $recipe->short_description,
             'long_description'      => $recipe->long_description,
-            'image_url'             => url($recipe->image_url),
+            'image_url'             => $recipe->image_url ?  url($recipe->image_url) : null,
             'original_ingredients'  => $originalIngredientSections,
             'generated_ingredients' => $aiGeneratedIngredients,
             'instructions'          => $recipe->instructions,
