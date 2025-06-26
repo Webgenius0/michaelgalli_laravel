@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Api\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\MealPlan;
+use App\Models\SubscriptionFeature;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Cashier\Exceptions\IncompletePayment;
@@ -218,6 +219,8 @@ class SubscriptionController extends Controller
         $total       = $plan->people * $plan->recipes_per_week;
         $total_price = $plan->price_per_serving * $total;
 
+        $features = SubscriptionFeature::first();
+
         $data = [
             'plan_name'     => $plan->name,       // e.g., Family Plan
             'price'         => $total_price ?? 0, // e.g., 100.00
@@ -228,16 +231,8 @@ class SubscriptionController extends Controller
             'people'        => $plan->people ?? 4,
 
             'features'      => [
-                'what_you_get' => [
-                    ['icon' => '–', 'text' => '16 servings/week'],
-                    ['icon' => '–', 'text' => 'AI-personalized meals'],
-                    ['icon' => '–', 'text' => 'Per-member swap breakdown'],
-                    ['icon' => '–', 'text' => 'Printed & Downloadable recipe card'],
-                ],
-                'includes'     => [
-                    ['icon' => '✅', 'text' => 'AI-personalized meals'],
-                    ['icon' => '✅', 'text' => 'Downloadable nutrition insights'],
-                ],
+                'main_feature' => $features->description,
+                'include_feature' => $features->include_description
             ],
 
             'status'        => $subscription->stripe_status, // active / paused / cancelled

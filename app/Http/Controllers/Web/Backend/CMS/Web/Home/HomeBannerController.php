@@ -23,7 +23,7 @@ class HomeBannerController extends Controller
     public $page = PageEnum::HOME;
     public $item = SectionEnum::HOME_BANNER;
     public $items = SectionEnum::HOME_BANNERS;
-    public $count = 4;
+    public $count = 20;
 
     public function __construct(CmsService $cmsService)
     {
@@ -98,7 +98,7 @@ class HomeBannerController extends Controller
             $validatedData['page'] = $this->page;
             $validatedData['section'] = $this->items;
 
-            $counting = CMS::where('page', $validatedData['page'])->where('section', $validatedData['section'])->count(); 
+            $counting = CMS::where('page', $validatedData['page'])->where('section', $validatedData['section'])->count();
             if ($counting >= $this->count) {
                 return redirect()->back()->with('t-error', "Maximum  {$this->count} Item You Can Add");
             }
@@ -106,7 +106,7 @@ class HomeBannerController extends Controller
             if ($request->hasFile('bg')) {
                 $validatedData['bg'] = Helper::fileUpload($request->file('bg'), $this->section, time() . '_' . getFileName($request->file('bg')));
             }
-            
+
             if ($request->hasFile('image')) {
                 $validatedData['image'] = Helper::fileUpload($request->file('image'), $this->section, time() . '_' . getFileName($request->file('image')));
             }
@@ -165,7 +165,7 @@ class HomeBannerController extends Controller
                 }
                 $validatedData['bg'] = Helper::fileUpload($request->file('bg'), $this->section, time() . '_' . getFileName($request->file('bg')));
             }
-            
+
             if ($request->hasFile('image')) {
                 if ($section->image && file_exists(public_path($section->image))) {
                     Helper::fileDelete(public_path($section->image));

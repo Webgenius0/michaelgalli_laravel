@@ -34,6 +34,7 @@ use App\Http\Controllers\Web\Backend\Settings\FirebaseController;
 use App\Http\Controllers\Web\Backend\Settings\GoogleMapController;
 use App\Http\Controllers\Web\Backend\Settings\MailSettingController;
 use App\Http\Controllers\Web\Backend\CMS\Web\Home\HomeBannerController;
+use App\Http\Controllers\Web\Backend\SubscriptionFeatureController;
 
 Route::get("dashboard", [DashboardController::class, 'index'])->name('dashboard');
 
@@ -182,6 +183,14 @@ Route::controller(MealPlanController::class)->prefix('meal-plan')->name('meal_pl
 
 
 
+Route::controller(SubscriptionFeatureController::class)->prefix('feature')->name('feature.')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('/create', 'create')->name('create');
+    Route::post('/store', 'store')->name('store');
+
+});
+
+
 
 
 
@@ -259,7 +268,7 @@ Route::prefix('cms')->name('cms.')->group(function () {
 
         Route::put('/content', 'content')->name('content');
     });
-    
+
 });
 
 /*

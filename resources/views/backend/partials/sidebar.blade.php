@@ -50,8 +50,27 @@
                             <path d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208s208-93.1 208-208S370.9 48 256 48zM256 416c-88.4 0-160-71.6-160-160s71.6-160 160-160s160 71.6 160 160s-71.6 160-160 160z" />
                             <path d="M256 128c-70.7 0-128 57.3-128 128s57.3 128 128 128s128-57.3 128-128S326.7 128 256 128zM256 352c-52.9 0-96-43.1-96-96s43.1-96 96-96s96 43.1 96 96s-43.1 96-96 96z" />
                         </svg>
-                        
+
                         <span class="side-menu__label">Meal Plan</span>
+                    </a>
+                </li>
+
+
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->routeIs('admin.feature.*') ? 'active' : '' }}"
+                        href="{{ route('admin.feature.index') }}">
+
+
+
+                        {{-- meal icon --}}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 512 512"
+                            fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="32">
+                            <path d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208s208-93.1 208-208S370.9 48 256 48zM256 416c-88.4 0-160-71.6-160-160s71.6-160 160-160s160 71.6 160 160s-71.6 160-160 160z" />
+                            <path d="M256 128c-70.7 0-128 57.3-128 128s57.3 128 128 128s128-57.3 128-128S326.7 128 256 128zM256 352c-52.9 0-96-43.1-96-96s43.1-96 96-96s96 43.1 96 96s-43.1 96-96 96z" />
+                        </svg>
+
+                        <span class="side-menu__label">Subscirtion Feature</span>
                     </a>
                 </li>
 
@@ -175,7 +194,7 @@
                         <span class="side-menu__label">Sub Category</span>
                     </a>
                 </li> --}}
-                
+
 
 
 
@@ -281,7 +300,7 @@
                         <span class="side-menu__label">FAQ</span>
                     </a>
                 </li>
-                
+
             </ul>
             <div class="slide-right" id="slide-right"><svg xmlns="http://www.w3.org/2000/svg" fill="#7b8191"
                     width="24" height="24" viewBox="0 0 24 24">

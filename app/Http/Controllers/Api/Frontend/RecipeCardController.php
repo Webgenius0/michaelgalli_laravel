@@ -15,6 +15,7 @@ class RecipeCardController extends Controller
         $perPage = $request->input('per_page', 10); // default 10 per page
 
         $orders = Order::with([
+            'recipes.recipe.category',
             'recipes.recipe.protein',
             'recipes.recipe.calory',
             'recipes.recipe.carb',
@@ -65,6 +66,7 @@ class RecipeCardController extends Controller
                     'recipe_id'    => $recipe->id,
                     'name'         => $recipe->title ?? $recipe->name,
                     'image'        => url($recipe->image_url),
+                    'category'      => optional($recipe->category)->name,
                     'protein'      => optional($recipe->protein)->name,
                     'calory'       => optional($recipe->calory)->name,
                     'carb'         => optional($recipe->carb)->name,
