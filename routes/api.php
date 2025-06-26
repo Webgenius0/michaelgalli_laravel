@@ -182,9 +182,13 @@ Route::middleware(['auth:api'])->controller(SubscriptionController::class)->pref
     Route::get('/meal/plans', 'mealPlans');
 
     // create , pause, cancel
+
     Route::post('/subscribe', 'subscribe');
     Route::post('/pause', 'pauseSubscription');
     Route::post('/cancel', 'cancelSubscription');
+
+    // get subscription details
+    Route::get('/details', 'subscriptionDetails');
 });
 
 // stripe webhook

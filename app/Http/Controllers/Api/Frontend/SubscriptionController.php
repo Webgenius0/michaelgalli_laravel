@@ -1,16 +1,14 @@
 <?php
-
 namespace App\Http\Controllers\Api\Frontend;
 
-use Stripe\Stripe;
-use App\Models\MealPlan;
-use Stripe\StripeClient;
-use App\Traits\ApiResponse;
-use Illuminate\Http\Request;
-use Stripe\Checkout\Session;
 use App\Http\Controllers\Controller;
+use App\Models\MealPlan;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Cashier\Exceptions\IncompletePayment;
+use Stripe\Checkout\Session;
+use Stripe\Stripe;
+use Stripe\StripeClient;
 
 class SubscriptionController extends Controller
 {
@@ -29,34 +27,32 @@ class SubscriptionController extends Controller
 
         if ($mealPlans->isEmpty()) {
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => 'No meal plans available.',
-                'data' => [],
+                'data'    => [],
             ], 404);
         }
 
-
         return response()->json([
-            'status' => true,
+            'status'  => true,
             'message' => 'Meal plans retrieved successfully.',
-            'data' => $mealPlans,
+            'data'    => $mealPlans,
         ], 200);
     }
-
 
     public function subscribe(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'meal_plan_id' => 'required|exists:meal_plans,id',
-            'member_ids' => 'array',
-            'member_ids' => 'exists:user_family_members,id'
+            'member_ids'   => 'array',
+            'member_ids'   => 'exists:user_family_members,id',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => $validator->errors()->first(),
-                'data' => [],
+                'data'    => [],
             ], 422);
         }
 
@@ -64,11 +60,11 @@ class SubscriptionController extends Controller
 
         // dd($meal_plan);
 
-        if (!$meal_plan || !$meal_plan->stripe_price_id) {
+        if (! $meal_plan || ! $meal_plan->stripe_price_id) {
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => 'Meal plan not found or does not have a Stripe price ID.',
-                'data' => [],
+                'data'    => [],
             ], 404);
         }
 
@@ -76,17 +72,17 @@ class SubscriptionController extends Controller
 
         try {
             $checkoutSession = Session::create([
-                'line_items' => [[
-                    'price' => $meal_plan->stripe_price_id,
+                'line_items'  => [[
+                    'price'    => $meal_plan->stripe_price_id,
                     'quantity' => 1,
                 ]],
-                'mode' => 'subscription',
+                'mode'        => 'subscription',
                 'success_url' => route('subscription.success', ['user_id' => auth('api')->id()]),
-                'cancel_url' => route('subscription.cancel', ['user_id' => auth('api')->id()]),
-                'metadata' => [
-                    'user_id' => auth('api')->id(),
+                'cancel_url'  => route('subscription.cancel', ['user_id' => auth('api')->id()]),
+                'metadata'    => [
+                    'user_id'      => auth('api')->id(),
                     'meal_plan_id' => $meal_plan->id,
-                    'member_ids' => implode(',', $request->member_ids ?? []),
+                    'member_ids'   => implode(',', $request->member_ids ?? []),
                 ],
             ]);
 
@@ -95,39 +91,36 @@ class SubscriptionController extends Controller
         } catch (\Exception $e) {
 
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => 'Error creating checkout session: ' . $e->getMessage(),
-                'data' => [],
+                'data'    => [],
             ], 500);
         } catch (IncompletePayment $e) {
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => 'Payment incomplete: ' . $e->getMessage(),
-                'data' => [],
+                'data'    => [],
             ], 400);
         }
 
         $checkout_url = $checkoutSession->url;
 
         return response()->json([
-            'status' => true,
+            'status'  => true,
             'message' => 'Checkout session created successfully.',
-            'data' => [
+            'data'    => [
                 'checkout_url' => $checkout_url,
             ],
         ], 200);
     }
 
-
-
-
     public function success($user_id)
     {
         // Handle successful subscription logic here
         return response()->json([
-            'status' => true,
+            'status'  => true,
             'message' => 'Subscription successful for user ID: ' . $user_id,
-            'data' => [],
+            'data'    => [],
         ], 200);
     }
 
@@ -135,23 +128,23 @@ class SubscriptionController extends Controller
     {
         // Handle subscription cancellation logic here
         return response()->json([
-            'status' => false,
+            'status'  => false,
             'message' => 'Subscription cancelled for user ID: ' . $user_id,
-            'data' => [],
+            'data'    => [],
         ], 200);
     }
 
     // pause subscription
     public function pauseSubscription(Request $request)
     {
-        $user = auth('api')->user();
+        $user         = auth('api')->user();
         $subscription = $user->subscriptions()->where('stripe_status', 'active')->first();
 
-        if (!$subscription) {
+        if (! $subscription) {
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => 'No active subscription found.',
-                'data' => [],
+                'data'    => [],
             ], 404);
         }
 
@@ -164,26 +157,24 @@ class SubscriptionController extends Controller
         $subscription->stripe_status = 'paused';
         $subscription->save();
 
-
-
         return response()->json([
-            'status' => true,
+            'status'  => true,
             'message' => 'Subscription paused successfully.',
-            'data' => $stripeSub,
+            'data'    => $stripeSub,
         ], 200);
     }
 
     // cancel subscription
     public function cancelSubscription(Request $request)
     {
-        $user = auth('api')->user();
+        $user         = auth('api')->user();
         $subscription = $user->subscriptions()->where('stripe_status', 'active')->first();
 
-        if (!$subscription) {
+        if (! $subscription) {
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => 'No active subscription found.',
-                'data' => [],
+                'data'    => [],
             ], 404);
         }
 
@@ -195,16 +186,70 @@ class SubscriptionController extends Controller
         $subscription->save();
 
         return response()->json([
-            'status' => true,
+            'status'  => true,
             'message' => 'Subscription cancelled successfully.',
-            'data' => $stripeSub,
+            'data'    => $stripeSub,
         ], 200);
 
-
-        
     }
 
+    public function subscriptionDetails()
+    {
+        $user         = auth('api')->user();
+        $subscription = $user->subscriptions()->latest()->first();
+
+        if (! $subscription) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'No subscription found.',
+                'data'    => [],
+            ], 404);
+        }
+
+        $plan = $subscription->mealPlan;
+        if (! $plan) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Meal plan not found for this subscription.',
+                'data'    => [],
+            ], 404);
+        }
+
+        $total       = $plan->people * $plan->recipes_per_week;
+        $total_price = $plan->price_per_serving * $total;
+
+        $data = [
+            'plan_name'     => $plan->name,       // e.g., Family Plan
+            'price'         => $total_price ?? 0, // e.g., 100.00
+            'currency'      => $plan->currency ?? 'AED',
+            'billing_cycle' => $plan->billing_cycle ?? 'weekly', // weekly, monthly etc.
+            // 'servings'      => $plan->servings_per_week,         // e.g., 16
+            'meals'         => $plan->recipes_per_week,            // e.g., 4
+            'people'        => $plan->people ?? 4,
+
+            'features'      => [
+                'what_you_get' => [
+                    ['icon' => '–', 'text' => '16 servings/week'],
+                    ['icon' => '–', 'text' => 'AI-personalized meals'],
+                    ['icon' => '–', 'text' => 'Per-member swap breakdown'],
+                    ['icon' => '–', 'text' => 'Printed & Downloadable recipe card'],
+                ],
+                'includes'     => [
+                    ['icon' => '✅', 'text' => 'AI-personalized meals'],
+                    ['icon' => '✅', 'text' => 'Downloadable nutrition insights'],
+                ],
+            ],
+
+            'status'        => $subscription->stripe_status, // active / paused / cancelled
 
 
-    
+        ];
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Subscription details retrieved successfully.',
+            'data'    => $data,
+        ], 200);
+    }
+
 }
