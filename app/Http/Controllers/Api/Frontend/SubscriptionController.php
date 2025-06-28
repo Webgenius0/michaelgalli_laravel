@@ -84,6 +84,7 @@ class SubscriptionController extends Controller
                     'user_id'      => auth('api')->id(),
                     'meal_plan_id' => $meal_plan->id,
                     'member_ids'   => implode(',', $request->member_ids ?? []),
+                    // 'recipe_ids' => implode(',', $request->recipe_ids), // Example: [5, 9, 13]
                 ],
             ]);
 
