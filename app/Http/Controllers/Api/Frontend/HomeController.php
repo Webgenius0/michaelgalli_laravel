@@ -20,10 +20,10 @@ class HomeController extends Controller
                     ->whereIn('section', [SectionEnum::HOME_BANNER, SectionEnum::HOME_BANNERS])
                     ->get();
 
-        $data['home_banner']    = $cmsItems->where('section', SectionEnum::HOME_BANNER)->first();
-        $data['home_banners']   = $cmsItems->where('section', SectionEnum::HOME_BANNERS)->values();
-        $data['common']         = CMS::where('page', PageEnum::COMMON)->where('status', 'active')->get();
-        $data['settings']       = Setting::first();
+        $data['how_it_work']    = $cmsItems->where('section', SectionEnum::HOME_BANNER)->first();
+        $data['how_it_works']   = $cmsItems->where('section', SectionEnum::HOME_BANNERS)->values();
+        // $data['common']         = CMS::where('page', PageEnum::COMMON)->where('status', 'active')->get();
+        // $data['settings']       = Setting::first();
 
         return Helper::jsonResponse(true, 'Home Page', 200, $data);
 

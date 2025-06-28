@@ -21,7 +21,7 @@ class UserFamilyMemberController extends Controller
 
 
         if ($familyMembers->isEmpty()) {
-            return $this->error([], 'No Family Members Found', 404);
+            return $this->success([], 'No Family Members Found', 202);
         }
 
 
@@ -45,7 +45,7 @@ class UserFamilyMemberController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->error([], $validator->errors()->first(), 422);
+            return $this->success([], 'No Family Members Found', 202);
         }
 
 
@@ -70,7 +70,7 @@ class UserFamilyMemberController extends Controller
         $familyMember = $request->user()->familyMembers()->find($id);
 
         if (!$familyMember) {
-            return $this->error([], 'Family Member Not Found', 404);
+            return $this->success([], 'No Family Members Found', 202);
         }
 
         return $this->success($familyMember, 'Family Member Retrieved Successfully');
@@ -82,7 +82,7 @@ class UserFamilyMemberController extends Controller
         $familyMember = $request->user()->familyMembers()->find($id);
 
         if (!$familyMember) {
-            return $this->error([], 'Family Member Not Found', 404);
+            return $this->success([], 'No Family Members Found', 202);
         }
 
         $validator = Validator::make($request->all(), [
@@ -119,7 +119,7 @@ class UserFamilyMemberController extends Controller
         $familyMember = $request->user()->familyMembers()->find($id);
 
         if (!$familyMember) {
-            return $this->error([], 'Family Member Not Found', 404);
+            return $this->success([], 'No Family Members Found', 202);
         }
 
         $familyMember->delete();

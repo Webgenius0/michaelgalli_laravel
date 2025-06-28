@@ -1,15 +1,17 @@
 <?php
 namespace App\Http\Controllers\Api\Frontend;
 
-use App\Models\Order;
-use App\Models\Recipe;
 use App\Helpers\Helper;
-use App\Models\OrderRecipe;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Order;
+use App\Models\OrderRecipe;
+use App\Models\Recipe;
+use App\Traits\ApiResponse;
+use Illuminate\Http\Request;
 
 class RecipeCardController extends Controller
 {
+    use ApiResponse;
     public function recipe_list(Request $request)
     {
         $perPage = $request->input('per_page', 10); // default 10 per page
@@ -66,7 +68,7 @@ class RecipeCardController extends Controller
                     'recipe_id'    => $recipe->id,
                     'name'         => $recipe->title ?? $recipe->name,
                     'image'        => url($recipe->image_url),
-                    'category'      => optional($recipe->category)->name,
+                    'category'     => optional($recipe->category)->name,
                     'protein'      => optional($recipe->protein)->name,
                     'calory'       => optional($recipe->calory)->name,
                     'carb'         => optional($recipe->carb)->name,
@@ -215,5 +217,26 @@ class RecipeCardController extends Controller
         // dd($pdf);
 
         // return $pdf->download('recipe_' . $recipe->id . '.pdf');
+    }
+
+    public function order_history()
+    {
+        $orders = Order::with('recipes')->get();
+
+        if ($orders->isEmpty()) {
+            return $this->error([], 'No Delivery Addresses Found', 404);
+        }
+
+        $data = $orders->map(function ($order) {
+            return [
+                'order_id'   => $order->id,
+                'item' => $order->recipes()->count('quantity'),
+                'order_date' => $order->created_at,
+                'status' => $order->status
+
+            ];
+        });
+
+        return $this->success($data, 'Delivery Addresses List Retrieved Successfully');
     }
 }

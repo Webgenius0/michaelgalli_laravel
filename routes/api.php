@@ -1,35 +1,34 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\ChatController;
-use App\Http\Controllers\Api\Auth\UserController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\LogoutController;
-use App\Http\Controllers\Api\Frontend\FaqController;
-use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\Auth\RegisterController;
-use App\Http\Controllers\Api\FirebaseTokenController;
-use App\Http\Controllers\Api\Frontend\HomeController;
-use App\Http\Controllers\Api\Frontend\PostController;
-use App\Http\Controllers\Api\Frontend\ImageController;
-use App\Http\Controllers\Api\Auth\SocialLoginController;
-use App\Http\Controllers\Api\Frontend\categoryController;
-use App\Http\Controllers\Api\Frontend\QuestionController;
-use App\Http\Controllers\Api\Frontend\SettingsController;
 use App\Http\Controllers\Api\Auth\ResetPasswordController;
-use App\Http\Controllers\Api\Frontend\SubscriberController;
-use App\Http\Controllers\Api\Frontend\SocialLinksController;
-use App\Http\Controllers\Api\Frontend\SubcategoryController;
-use App\Http\Controllers\Api\Frontend\UserProfileController;
-use App\Http\Controllers\Api\Frontend\RecipeManageController;
-use App\Http\Controllers\Api\Frontend\SubscriptionController;
-use App\Http\Controllers\Api\Frontend\StripeWebhookController;
+use App\Http\Controllers\Api\Auth\SocialLoginController;
+use App\Http\Controllers\Api\Auth\UserController;
+use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\Api\FirebaseTokenController;
+use App\Http\Controllers\Api\Frontend\categoryController;
 use App\Http\Controllers\Api\Frontend\DeliveryAddressController;
+use App\Http\Controllers\Api\Frontend\FaqController;
+use App\Http\Controllers\Api\Frontend\HomeController;
+use App\Http\Controllers\Api\Frontend\ImageController;
+use App\Http\Controllers\Api\Frontend\PostController;
+use App\Http\Controllers\Api\Frontend\QuestionController;
 use App\Http\Controllers\Api\Frontend\RecipeCardController;
 use App\Http\Controllers\Api\Frontend\RecipeFilterController;
+use App\Http\Controllers\Api\Frontend\RecipeManageController;
+use App\Http\Controllers\Api\Frontend\SettingsController;
+use App\Http\Controllers\Api\Frontend\SocialLinksController;
+use App\Http\Controllers\Api\Frontend\StripeWebhookController;
+use App\Http\Controllers\Api\Frontend\SubcategoryController;
+use App\Http\Controllers\Api\Frontend\SubscriberController;
+use App\Http\Controllers\Api\Frontend\SubscriptionController;
 use App\Http\Controllers\Api\Frontend\UserDnaReportController;
 use App\Http\Controllers\Api\Frontend\UserFamilyMemberController;
-
+use App\Http\Controllers\Api\Frontend\UserProfileController;
+use App\Http\Controllers\Api\NotificationController;
+use Illuminate\Support\Facades\Route;
 
 //page
 Route::get('/page/home', [HomeController::class, 'index']);
@@ -42,13 +41,10 @@ Route::get('/settings', [SettingsController::class, 'index']);
 Route::get('/faq', [FaqController::class, 'index']);
 Route::post('subscriber/store', [SubscriberController::class, 'store'])->name('subscriber.store');
 
-
 Route::get('/question/list', [QuestionController::class, 'index']);
-
 
 Route::get('/recipe/list', [RecipeManageController::class, 'recipe_list']);
 Route::get('/recipe/details/{id}', [RecipeManageController::class, 'recipe_details']);
-
 
 Route::get('/category/list', [RecipeFilterController::class, 'category_list']);
 Route::get('/protein/list', [RecipeFilterController::class, 'protein_list']);
@@ -58,11 +54,6 @@ Route::get('/carbs/list', [RecipeFilterController::class, 'carbs_list']);
 Route::get('/cuisine/list', [RecipeFilterController::class, 'cuisine_list']);
 Route::get('/health_goal/list', [RecipeFilterController::class, 'health_goal_list']);
 Route::get('/time_to_cook/list', [RecipeFilterController::class, 'time_to_cook_list']);
-
-
-
-
-
 
 /*
 # Post
@@ -114,8 +105,6 @@ Route::group(['middleware' => ['auth:api', 'api-otp']], function ($router) {
     Route::delete('/delete-profile', [UserController::class, 'destroy']);
 });
 
-
-
 Route::middleware(['auth:api'])->controller(QuestionController::class)->prefix('question')->group(function () {
     Route::post('/store', 'store');
 });
@@ -126,7 +115,6 @@ Route::middleware(['auth:api'])->controller(DeliveryAddressController::class)->p
     Route::post('/store', 'store');
 });
 
-
 // user profile
 Route::middleware(['auth:api'])->controller(UserProfileController::class)->prefix('user/profile')->group(function () {
     Route::get('/show', 'index');
@@ -136,8 +124,6 @@ Route::middleware(['auth:api'])->controller(UserProfileController::class)->prefi
     // change password
     Route::post('/change-password', 'changePassword');
 });
-
-
 
 // user family member
 Route::middleware(['auth:api'])->controller(UserFamilyMemberController::class)->prefix('user/family')->group(function () {
@@ -151,20 +137,17 @@ Route::middleware(['auth:api'])->controller(UserFamilyMemberController::class)->
     Route::post('/quiz/store', 'quizStore');
 });
 
-
 // user family member
 Route::middleware(['auth:api'])->controller(RecipeCardController::class)->prefix('user/recipe/card')->group(function () {
     Route::get('/list', 'recipe_list');
     Route::get('/details/{recipe_id}', 'recipe_details');
 
-
+    // order list
+    Route::get('/order/history','order_history');
 
 });
 
-Route::get('/download-pdf/{id}',[RecipeCardController::class, 'download_recipe_pdf'])->name('api.recipe.download');
-
-
-
+Route::get('/download-pdf/{id}', [RecipeCardController::class, 'download_recipe_pdf'])->name('api.recipe.download');
 
 // user family member
 Route::middleware(['auth:api'])->controller(UserDnaReportController::class)->prefix('user/dna/report')->group(function () {
@@ -172,8 +155,6 @@ Route::middleware(['auth:api'])->controller(UserDnaReportController::class)->pre
     Route::post('/store', 'store');
 
 });
-
-
 
 // subscribe
 Route::middleware(['auth:api'])->controller(SubscriptionController::class)->prefix('subscriber')->group(function () {
@@ -193,9 +174,6 @@ Route::middleware(['auth:api'])->controller(SubscriptionController::class)->pref
 
 // stripe webhook
 Route::post('/orders', [StripeWebhookController::class, 'orderIngredient'])->middleware('auth:api');
-
-
-
 
 /*
 # Firebase Notification Route
@@ -238,5 +216,5 @@ Route::middleware(['auth:api'])->controller(ChatController::class)->prefix('auth
 */
 
 Route::prefix('cms')->name('cms.')->group(function () {
-    Route::get('home', [HomeController::class, 'index'])->name('home');
+    Route::get('home/how-it-works', [HomeController::class, 'index'])->name('home');
 });
