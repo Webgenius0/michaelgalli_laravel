@@ -159,8 +159,6 @@ Route::middleware(['auth:api'])->controller(UserDnaReportController::class)->pre
 // subscribe
 Route::middleware(['auth:api'])->controller(SubscriptionController::class)->prefix('subscriber')->group(function () {
 
-    // get meal plans
-    Route::get('/meal/plans', 'mealPlans');
 
     // create , pause, cancel
 
@@ -174,6 +172,7 @@ Route::middleware(['auth:api'])->controller(SubscriptionController::class)->pref
 
 // stripe webhook
 Route::post('/orders', [StripeWebhookController::class, 'orderIngredient'])->middleware('auth:api');
+Route::get('/subscriber/meal/plans', [SubscriptionController::class, 'mealPlans']);
 
 /*
 # Firebase Notification Route
@@ -195,6 +194,12 @@ Route::middleware(['auth:api'])->controller(NotificationController::class)->pref
     Route::get('/', 'index');
     Route::get('status/read/all', 'readAll');
     Route::get('status/read/{id}', 'readSingle');
+
+
+    Route::post("contact/us", "contact_us");
+
+
+
 })->middleware('auth:api');
 
 /*

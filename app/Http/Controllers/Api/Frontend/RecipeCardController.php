@@ -219,24 +219,36 @@ class RecipeCardController extends Controller
         // return $pdf->download('recipe_' . $recipe->id . '.pdf');
     }
 
-    public function order_history()
+    public function order_history(Request $request)
     {
-        $orders = Order::with('recipes')->get();
+        $perPage = $request->input('per_page', 10); // Default 10 per page
+
+        $orders = Order::with('recipes')->latest()->paginate($perPage);
 
         if ($orders->isEmpty()) {
             return $this->error([], 'No Delivery Addresses Found', 404);
         }
 
-        $data = $orders->map(function ($order) {
+        $data = $orders->getCollection()->map(function ($order) {
             return [
                 'order_id'   => $order->id,
-                'item' => $order->recipes()->count('quantity'),
+                'item'       => $order->recipes->count(),
                 'order_date' => $order->created_at,
-                'status' => $order->status
-
+                'status'     => $order->status,
             ];
         });
 
-        return $this->success($data, 'Delivery Addresses List Retrieved Successfully');
+        // Replace the collection with the mapped data
+        $orders->setCollection($data);
+
+        return $this->success([
+            'data'       => $orders->items(),
+            'pagination' => [
+                'current_page' => $orders->currentPage(),
+                'last_page'    => $orders->lastPage(),
+                'per_page'     => $orders->perPage(),
+                'total'        => $orders->total(),
+            ],
+        ], 'Order List Retrieved Successfully');
     }
 }
