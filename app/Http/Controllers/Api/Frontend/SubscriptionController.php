@@ -43,10 +43,17 @@ class SubscriptionController extends Controller
 
     public function subscribe(Request $request)
     {
+
+
         $validator = Validator::make($request->all(), [
             'meal_plan_id' => 'required|exists:meal_plans,id',
-            'member_ids'   => 'array',
-            'member_ids'   => 'exists:user_family_members,id',
+            'member_ids'   => 'required|array',
+            'member_ids'   => 'required|exists:user_family_members,id',
+
+            'recipe_ids'   => 'required|array',
+            'recipe_ids'   => 'required|exists:recipes,id',
+
+
         ]);
 
         if ($validator->fails()) {
@@ -84,7 +91,7 @@ class SubscriptionController extends Controller
                     'user_id'      => auth('api')->id(),
                     'meal_plan_id' => $meal_plan->id,
                     'member_ids'   => implode(',', $request->member_ids ?? []),
-                    // 'recipe_ids' => implode(',', $request->recipe_ids), // Example: [5, 9, 13]
+                    'recipe_ids' => implode(',', $request->recipe_ids), // Example: [5, 9, 13]
                 ],
             ]);
 

@@ -99,20 +99,20 @@ class StripeWebhookController extends Controller
 
                         // যদি customer checkout করার সময় ৩টি recipe নির্বাচন করে এবং Stripe Checkout Session এর metadata তে recipe IDs পাঠানো হয় (যেমন: recipe_ids = 5,9,13), তাহলে আপনি এই metadata থেকে ওই IDs read করে সেই অনুযায়ী $recipes পাবেন।
 
-                        // $recipeIdsString = $invoice->metadata->recipe_ids ?? '';
-                        // $recipeIds       = array_filter(explode(',', $recipeIdsString));
+                        $recipeIdsString = $invoice->metadata->recipe_ids ?? '';
+                        $recipeIds       = array_filter(explode(',', $recipeIdsString));
 
                         // if (! empty($recipeIds)) {
-                        //     $recipes = Recipe::whereIn('id', $recipeIds)->get();
+                        $recipes = Recipe::whereIn('id', $recipeIds)->get();
                         // } else {
                         //     $recipes = Recipe::inRandomOrder()
                         //         ->take($mealPlan->recipes_per_week)
                         //         ->get();
                         // }
 
-                        $recipes = Recipe::inRandomOrder()
-                            ->take(3)
-                            ->get();
+                        // $recipes = Recipe::inRandomOrder()
+                        //     ->take(3)
+                        //     ->get();
 
                         $order = $user->orders()->create([
                             'week_start' => $weekStart,
