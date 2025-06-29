@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Web\Backend;
 
 use App\Http\Controllers\Controller;
@@ -23,10 +22,13 @@ class MealPlanOptionController extends Controller
         if ($request->ajax()) {
 
             // meal plans
-            $data = MealPlanOption::latest()->get();
+            $data = MealPlanOption::with('meal_plan')->latest()->get();
             return DataTables::of($data)
 
                 ->addIndexColumn()
+                 ->addColumn('plan', function ($data) {
+                    return $data->meal_plan->name;
+                })
                 ->addColumn('action', function ($data) {
                     $encryptedId = Crypt::encryptString($data->id);
 
@@ -69,9 +71,9 @@ class MealPlanOptionController extends Controller
     {
 
         $rules = [
-            'name'         => 'required|string|max:255',
-            'people_count' => 'required|integer|min:1',
-
+            'meal_plan_id'      => 'required|exists:meal_plans,id',
+            'recipes_per_week'  => 'required|integer|min:1|max:7',
+            'price_per_serving' => 'required|numeric|min:1',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -84,21 +86,21 @@ class MealPlanOptionController extends Controller
             // Start DB transaction
             DB::beginTransaction();
 
-            MealPlan::create([
-                'name'         => $request->name,
-                'people_count' => $request->people_count,
+            MealPlanOption::create([
+                'meal_plan_id'         => $request->meal_plan_id,
+                'recipes_per_week'         => $request->recipes_per_week,
+                'price_per_serving' => $request->price_per_serving,
+                'is_recommanded' => $request->has('is_recommanded'), // <-- auto true/false
             ]);
 
             DB::commit();
 
-            return redirect()->route('admin.meal_plan.index')->with('t-success', 'Meal plan created successfully.');
+            return redirect()->route('admin.meal_plan_option.index')->with('t-success', 'Meal plan option created successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('t-error', 'Error: ' . $e->getMessage())->withInput();
         }
     }
-
-
 
     /**
      * Show the form for editing the specified resource.
@@ -107,10 +109,13 @@ class MealPlanOptionController extends Controller
     {
         $id = Crypt::decryptString($encryptedId);
 
-        $meal_plan = MealPlan::findOrFail($id);
+        $meal_plan_option = MealPlanOption::findOrFail($id);
+        $meal_plans = MealPlan::get();
+
 
         return view('backend.layouts.meal_item_option.edit', compact(
-            'meal_plan',
+            'meal_plans',
+            'meal_plan_option',
             'encryptedId'
         ));
     }
@@ -123,9 +128,9 @@ class MealPlanOptionController extends Controller
         $id = Crypt::decryptString($encryptedId);
 
         $rules = [
-            'name'              => 'required|string|max:255',
-            'people_count'            => 'required|integer|min:1',
-
+            'meal_plan_id'      => 'required|exists:meal_plans,id',
+            'recipes_per_week'  => 'required|integer|min:1|max:7',
+            'price_per_serving' => 'required|numeric|min:1',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -137,15 +142,17 @@ class MealPlanOptionController extends Controller
         try {
             DB::beginTransaction();
 
-            $recipe                    = MealPlan::findOrFail($id);
-            $recipe->name              = $request->name;
-            $recipe->people_count            = $request->people_count;
+            $recipe               = MealPlanOption::findOrFail($id);
+            $recipe->meal_plan_id         = $request->meal_plan_id;
+            $recipe->recipes_per_week         = $request->recipes_per_week;
+            $recipe->price_per_serving = $request->price_per_serving;
+            $recipe->is_recommanded = $request->is_recommanded;
 
             $recipe->save();
 
             DB::commit();
 
-            return redirect()->route('admin.meal_plan.index')->with('t-success', 'Recipe updated successfully.');
+            return redirect()->route('admin.meal_plan_option.index')->with('t-success', 'Meal option updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('t-error', 'Error: ' . $e->getMessage())->withInput();
@@ -160,7 +167,7 @@ class MealPlanOptionController extends Controller
         try {
             $id = Crypt::decryptString($encryptedId);
 
-            $meal_plan = MealPlan::findOrFail($id);
+            $meal_plan = MealPlanOption::findOrFail($id);
             if (! $meal_plan) {
                 return response()->json([
                     'status'  => 't-error',
@@ -173,7 +180,7 @@ class MealPlanOptionController extends Controller
 
             return response()->json([
                 'status'  => 't-success',
-                'message' => 'Meal deleted successfully!',
+                'message' => 'Meal option deleted successfully!',
             ]);
         } catch (\Exception $e) {
             return response()->json([

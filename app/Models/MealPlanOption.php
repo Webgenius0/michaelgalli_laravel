@@ -12,6 +12,11 @@ class MealPlanOption extends Model
         'meal_plan_id',
         'price_per_serving',
         'recipes_per_week',
+        'is_recommanded'
+    ];
+
+    protected $casts = [
+        'is_recommanded'  => 'boolean'
     ];
 
 

@@ -3,7 +3,11 @@ namespace App\Http\Controllers\Api\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\MealPlan;
+use App\Models\MealPlanOption;
 use App\Models\SubscriptionFeature;
+use App\Models\UserFamilyCart;
+use App\Models\UserPlanCart;
+use App\Models\UserRecipeCart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Cashier\Exceptions\IncompletePayment;
@@ -22,9 +26,16 @@ class SubscriptionController extends Controller
     }
 
     // meal plan
-    public function mealPlans()
+    public function mealPlans(Request $request)
     {
-        $mealPlans = MealPlan::all();
+
+        $plan_id = $request->plan_id ?? 0;
+
+        $mealPlans = MealPlan::with('options')
+            ->when($plan_id > 0, function ($q) use ($plan_id) {
+                $q->where('id', $plan_id);
+            })
+            ->get();
 
         if ($mealPlans->isEmpty()) {
             return response()->json([
@@ -41,18 +52,18 @@ class SubscriptionController extends Controller
         ], 200);
     }
 
-    public function subscribe(Request $request)
+    public function add_to_cart(Request $request)
     {
 
-
         $validator = Validator::make($request->all(), [
-            'meal_plan_id' => 'required|exists:meal_plans,id',
-            'member_ids'   => 'required|array',
-            'member_ids'   => 'required|exists:user_family_members,id',
+            'meal_plan_id'        => 'required|exists:meal_plans,id',
+            'meal_plan_option_id' => 'required|exists:meal_plan_options,id',
 
-            'recipe_ids'   => 'required|array',
-            'recipe_ids'   => 'required|exists:recipes,id',
+            'member_ids'          => 'required|array',
+            'member_ids'          => 'required|exists:user_family_members,id',
 
+            'recipe_ids'          => 'required|array',
+            'recipe_ids'          => 'required|exists:recipes,id',
 
         ]);
 
@@ -65,15 +76,115 @@ class SubscriptionController extends Controller
         }
 
         $meal_plan = MealPlan::find($request->meal_plan_id);
-
-        // dd($meal_plan);
-
-        if (! $meal_plan || ! $meal_plan->stripe_price_id) {
+        if (! $meal_plan) {
             return response()->json([
                 'status'  => false,
-                'message' => 'Meal plan not found or does not have a Stripe price ID.',
+                'message' => 'Meal plan not found',
                 'data'    => [],
             ], 404);
+        }
+        $meal_plan_option = MealPlanOption::find($request->meal_plan_option_id);
+
+        if (! $meal_plan_option) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Meal plan option not found',
+                'data'    => [],
+            ], 404);
+        }
+
+        $user = auth('api')->user();
+
+        $total_servings = $meal_plan->people_count * $meal_plan_option->recipes_per_week;
+        $total_price    = $total_servings * $meal_plan_option->price_per_serving;
+
+        // user plan cart table store data create or update
+        $cart = UserPlanCart::updateOrCreate(
+            [
+                'user_id' => $user->id,
+            ],
+            [
+                'meal_plan_id'        => $meal_plan->id,
+                'meal_plan_option_id' => $meal_plan_option->id,
+                'price_per_serving'   => $meal_plan_option->price_per_serving,
+                'people_count'        => $meal_plan->people_count,
+                'recipes_per_week'    => $meal_plan_option->recipes_per_week,
+                'total_servings'      => $total_servings,
+                'total_price'         => $total_price,
+                'status'              => 'pending',
+            ]
+        );
+
+        // user family cart create or update
+        if (is_array($request->member_ids)) {
+            foreach ($request->member_ids as $member_id) {
+                UserFamilyCart::updateOrCreate(
+                    [
+                        'user_id'               => $user->id,
+                        'user_family_member_id' => $member_id,
+                    ]
+                );
+            }
+        }
+
+        // user recipee cart create and update
+        if (is_array($request->recipe_ids)) {
+            foreach ($request->recipe_ids as $recipe_id) {
+                UserRecipeCart::updateOrCreate(
+                    [
+                        'user_id'   => $user->id,
+                        'recipe_id' => $recipe_id,
+                    ]
+                );
+            }
+        }
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Recipe addded to cart successfully.',
+            'data'    => [
+                'cart' => $cart,
+
+            ],
+        ], 200);
+
+    }
+
+    public function subscribe(Request $request)
+    {
+        $user = auth('api')->user();
+
+        // Fetch cart data
+        $cart = UserPlanCart::where('user_id', $user->id)->first();
+        if (! $cart) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'No cart found for user.',
+                'data'    => [],
+            ], 404);
+        }
+
+        $meal_plan = MealPlan::find($cart->meal_plan_id);
+        if (! $meal_plan ) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Meal plan not found .',
+                'data'    => [],
+            ], 404);
+        }
+
+        // Get member_ids from UserFamilyCart
+        $member_ids = UserFamilyCart::where('user_id', $user->id)->pluck('user_family_member_id')->toArray();
+
+        // Get recipe_ids from UserRecipeCart
+        $recipe_ids = UserRecipeCart::where('user_id', $user->id)->pluck('recipe_id')->toArray();
+
+        if (empty($member_ids) || empty($recipe_ids)) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Cart must have at least one member and one recipe.',
+                'data'    => [],
+            ], 422);
         }
 
         Stripe::setApiKey(config('services.stripe.secret'));
@@ -81,8 +192,17 @@ class SubscriptionController extends Controller
         try {
             $checkoutSession = Session::create([
                 'line_items'  => [[
-                    'price'    => $meal_plan->stripe_price_id,
-                    'quantity' => 1,
+                    'price_data' => [
+                        'currency'     => 'aed',                            // Or use $meal_plan->currency if available
+                        'unit_amount'  => intval($cart->total_price * 100), // Stripe expects amount in cents
+                        'product_data' => [
+                            'name' => $meal_plan->name,
+                        ],
+                        'recurring'    => [
+                            'interval' => $meal_plan->billing_cycle ?? 'week', // 'week', 'month', etc.
+                        ],
+                    ],
+                    'quantity'   => 1,
                 ]],
                 'mode'        => 'subscription',
                 'success_url' => route('subscription.success', ['user_id' => auth('api')->id()]),
@@ -90,8 +210,8 @@ class SubscriptionController extends Controller
                 'metadata'    => [
                     'user_id'      => auth('api')->id(),
                     'meal_plan_id' => $meal_plan->id,
-                    'member_ids'   => implode(',', $request->member_ids ?? []),
-                    'recipe_ids' => implode(',', $request->recipe_ids), // Example: [5, 9, 13]
+                    'member_ids'   => implode(',', $member_ids ?? []),
+                    'recipe_ids'   => implode(',', $recipe_ids), // Example: [5, 9, 13]
                 ],
             ]);
 
@@ -234,17 +354,16 @@ class SubscriptionController extends Controller
             'price'         => $total_price ?? 0, // e.g., 100.00
             'currency'      => $plan->currency ?? 'AED',
             'billing_cycle' => $plan->billing_cycle ?? 'weekly', // weekly, monthly etc.
-            // 'servings'      => $plan->servings_per_week,         // e.g., 16
-            'meals'         => $plan->recipes_per_week,            // e.g., 4
+                                                                 // 'servings'      => $plan->servings_per_week,         // e.g., 16
+            'meals'         => $plan->recipes_per_week,          // e.g., 4
             'people'        => $plan->people ?? 4,
 
             'features'      => [
-                'main_feature' => $features->description,
-                'include_feature' => $features->include_description
+                'main_feature'    => $features->description,
+                'include_feature' => $features->include_description,
             ],
 
             'status'        => $subscription->stripe_status, // active / paused / cancelled
-
 
         ];
 

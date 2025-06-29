@@ -30,8 +30,8 @@
                                 </div>
                             </div>
                             <div class="card-body border-0">
-                                <form class="form-horizontal" method="POST" action="{{ route('admin.meal_plan.store') }}"
-                                    enctype="multipart/form-data">
+                                <form class="form-horizontal" method="POST"
+                                    action="{{ route('admin.meal_plan_option.store') }}" enctype="multipart/form-data">
                                     @csrf
 
                                     <!-- Recipe Title -->
@@ -54,6 +54,9 @@
                                                     <span class="text-danger">{{ $message }}</span>
                                                 @enderror
                                             </div>
+
+
+
 
                                             <div class="form-group">
                                                 <label for="recipes_per_week" class="form-label">Recipes per Week</label>
@@ -80,6 +83,18 @@
                                                     <span class="text-danger">{{ $message }}</span>
                                                 @enderror
                                             </div>
+
+
+                                             <div class="form-group">
+                                                <label for="is_recommanded" class="form-label">Recommended</label><br>
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input  " type="checkbox" id="is_recommanded"
+                                                        name="is_recommanded" value="1"
+                                                        {{ old('is_recommanded') ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="is_recommanded">Mark as
+                                                        Recommended</label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -96,7 +111,6 @@
             </div>
         </div>
     </div>
-    <!-- CONTAINER CLOSED -->
 @endsection
 
 @push('scripts')

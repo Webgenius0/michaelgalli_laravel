@@ -44,8 +44,10 @@
                                         <thead>
                                             <tr>
                                                 <th class="bg-transparent border-bottom-0 wp-15">ID</th>
-                                                <th class="bg-transparent border-bottom-0 wp-15">Name</th>
-                                                <th class="bg-transparent border-bottom-0 wp-15">Number of People</th>
+                                                <th class="bg-transparent border-bottom-0 wp-15">Plan Name</th>
+                                                <th class="bg-transparent border-bottom-0 wp-15">Recipes Per Week</th>
+                                                <th class="bg-transparent border-bottom-0 wp-15"> Price per Serving (AED)</th>
+                                                <th class="bg-transparent border-bottom-0 wp-15"> Is Recommanded</th>
 
 
                                                 <th class="bg-transparent border-bottom-0">Action</th>
@@ -113,15 +115,29 @@
                             searchable: false
                         },
                         {
-                            data: 'name',
-                            name: 'name',
+                            data: 'plan',
+                            name: 'plan',
                             orderable: true,
                             searchable: true
                         },
 
                         {
-                            data: 'people_count',
-                            name: 'people_count',
+                            data: 'recipes_per_week',
+                            name: 'recipes_per_week',
+                            orderable: true,
+                            searchable: true
+                        },
+
+                        {
+                            data: 'price_per_serving',
+                            name: 'price_per_serving',
+                            orderable: true,
+                            searchable: true
+                        },
+
+                         {
+                            data: 'is_recommanded',
+                            name: 'is_recommanded',
                             orderable: true,
                             searchable: true
                         },

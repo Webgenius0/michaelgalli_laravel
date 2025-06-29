@@ -162,6 +162,9 @@ Route::middleware(['auth:api'])->controller(SubscriptionController::class)->pref
 
     // create , pause, cancel
 
+    Route::post('/package/recipe/add-to-cart', 'add_to_cart');
+
+
     Route::post('/subscribe', 'subscribe');
     Route::post('/pause', 'pauseSubscription');
     Route::post('/cancel', 'cancelSubscription');

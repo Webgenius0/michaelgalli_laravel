@@ -16,6 +16,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('meal_plan_id')->constrained()->onDelete('cascade');
             $table->unsignedTinyInteger('recipes_per_week'); // 3, 4, 5, etc.
+            $table->boolean('is_recommanded')->default(false);
             $table->decimal('price_per_serving', 8, 2);      // e.g., 30.00
             $table->timestamps();
 

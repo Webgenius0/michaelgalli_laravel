@@ -28,7 +28,7 @@
                                 </div>
                             </div>
                             <div class="card-body border-0">
-                                <form method="POST" action="{{ route('admin.meal_plan.update', $encryptedId) }}"
+                                <form method="POST" action="{{ route('admin.meal_plan_option.update', $encryptedId) }}"
                                     enctype="multipart/form-data">
                                     @csrf
                                     @method('POST')
@@ -37,31 +37,63 @@
 
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <div
-                                                class="form-group
 
-                                                @error('name') is-invalid @enderror">
-                                                <label for="name" class="form-label">Name:</label>
-                                                <input type="text" class="form-control" name="name"
-                                                    placeholder="Enter Name" id=""
-                                                    value="{{ old('name', $meal_plan->name) }}">
-                                                @error('name')
+                                            <div class="form-group">
+                                                <label for="meal_plan_id">Meal Plan</label>
+                                                <select class="form-control @error('meal_plan_id') is-invalid @enderror"
+                                                    name="meal_plan_id" id="meal_plan_id">
+                                                    <option>Select</option>
+                                                    @foreach ($meal_plans as $meal_plan)
+                                                        <option value="{{ $meal_plan->id }}"
+                                                            {{ old('meal_plan_id', $meal_plan_option->meal_plan_id) == $meal_plan->id ? 'selected' : '' }}>
+                                                            {{ $meal_plan->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('meal_plan_id')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="recipes_per_week" class="form-label">Recipes per Week</label>
+                                                <input type="number"
+                                                    class="form-control @error('recipes_per_week') is-invalid @enderror"
+                                                    name="recipes_per_week" placeholder="Enter recipe per week "
+                                                    id="" value="{{ old('recipes_per_week', $meal_plan_option->recipes_per_week) }}">
+                                                @error('recipes_per_week')
                                                     <span class="text-danger">{{ $message }}</span>
                                                 @enderror
                                             </div>
 
 
-                                            <div
-                                                class="form-group
-                                                @error('people_count') is-invalid @enderror">
-                                                <label for="people_count" class="form-label">Number of People</label>
-                                                <input type="number" class="form-control" name="people_count"
-                                                    placeholder="Enter number of people" id=""
-                                                    value="{{ old('people_count', $meal_plan->people_count) }}">
-                                                @error('people_count')
+
+                                            <div class="form-group">
+                                                <label for="price_per_serving" class="form-label">
+                                                    Price per Serving (AED)
+                                                </label>
+                                                <input type="number"
+                                                    class="form-control @error('price_per_serving') is-invalid @enderror"
+                                                    name="price_per_serving" placeholder="Enter recipe per week "
+                                                    id="" value="{{ old('price_per_serving', $meal_plan_option->price_per_serving) }}">
+                                                @error('price_per_serving')
                                                     <span class="text-danger">{{ $message }}</span>
                                                 @enderror
                                             </div>
+
+
+
+                                        <div class="form-group">
+                                            <label for="is_recommanded" class="form-label">Recommended</label><br>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="is_recommanded"
+                                                       name="is_recommanded" value="1"
+                                                       {{ old('is_recommanded', $meal_plan_option->is_recommanded) ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="is_recommanded">Mark as Recommended</label>
+                                            </div>
+                                        </div>
+
+
 
                                         </div>
 
