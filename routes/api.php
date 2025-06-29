@@ -196,11 +196,13 @@ Route::middleware(['auth:api'])->controller(NotificationController::class)->pref
     Route::get('status/read/{id}', 'readSingle');
 
 
-    Route::post("contact/us", "contact_us");
 
 
 
 })->middleware('auth:api');
+
+
+Route::post('/notify/contact/us', [NotificationController::class, 'contact_us']);
 
 /*
 # Chat Route
