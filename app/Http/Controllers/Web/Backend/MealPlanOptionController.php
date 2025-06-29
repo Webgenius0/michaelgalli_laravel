@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Http\Controllers\Web\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\MealPlan;
+use App\Models\MealPlanOption;
 use App\Models\Recipe;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
-class MealPlanController extends Controller
+class MealPlanOptionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -21,7 +23,7 @@ class MealPlanController extends Controller
         if ($request->ajax()) {
 
             // meal plans
-            $data = MealPlan::latest()->get();
+            $data = MealPlanOption::latest()->get();
             return DataTables::of($data)
 
                 ->addIndexColumn()
@@ -45,7 +47,7 @@ class MealPlanController extends Controller
                 ->rawColumns(['action'])
                 ->make();
         }
-        return view("backend.layouts.meal_item.index");
+        return view("backend.layouts.meal_item_option.index");
     }
 
     /**
@@ -54,7 +56,9 @@ class MealPlanController extends Controller
     public function create()
     {
 
-        return view('backend.layouts.meal_item.create');
+        $meal_plans = MealPlan::get();
+
+        return view('backend.layouts.meal_item_option.create', compact('meal_plans'));
     }
 
     /**
@@ -105,7 +109,7 @@ class MealPlanController extends Controller
 
         $meal_plan = MealPlan::findOrFail($id);
 
-        return view('backend.layouts.meal_item.edit', compact(
+        return view('backend.layouts.meal_item_option.edit', compact(
             'meal_plan',
             'encryptedId'
         ));

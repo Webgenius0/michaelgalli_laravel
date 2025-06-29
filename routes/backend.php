@@ -34,6 +34,7 @@ use App\Http\Controllers\Web\Backend\Settings\FirebaseController;
 use App\Http\Controllers\Web\Backend\Settings\GoogleMapController;
 use App\Http\Controllers\Web\Backend\Settings\MailSettingController;
 use App\Http\Controllers\Web\Backend\CMS\Web\Home\HomeBannerController;
+use App\Http\Controllers\Web\Backend\MealPlanOptionController;
 use App\Http\Controllers\Web\Backend\SubscriptionFeatureController;
 
 Route::get("dashboard", [DashboardController::class, 'index'])->name('dashboard');
@@ -182,6 +183,31 @@ Route::controller(MealPlanController::class)->prefix('meal-plan')->name('meal_pl
 });
 
 
+Route::controller(MealPlanController::class)->prefix('meal-plan')->name('meal_plan.')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('/create', 'create')->name('create');
+    Route::post('/store', 'store')->name('store');
+    Route::get('/show/{id}', 'show')->name('show');
+    Route::get('/edit/{id}', 'edit')->name('edit');
+    Route::post('/update/{id}', 'update')->name('update');
+    Route::delete('/delete/{id}', 'destroy')->name('destroy');
+    Route::get('/status/{id}', 'status')->name('status');
+});
+
+
+Route::controller(MealPlanOptionController::class)->prefix('meal-plan-options')->name('meal_plan_option.')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('/create', 'create')->name('create');
+    Route::post('/store', 'store')->name('store');
+    Route::get('/show/{id}', 'show')->name('show');
+    Route::get('/edit/{id}', 'edit')->name('edit');
+    Route::post('/update/{id}', 'update')->name('update');
+    Route::delete('/delete/{id}', 'destroy')->name('destroy');
+    Route::get('/status/{id}', 'status')->name('status');
+});
+
+
+
 
 Route::controller(SubscriptionFeatureController::class)->prefix('feature')->name('feature.')->group(function () {
     Route::get('/', 'index')->name('index');
@@ -304,7 +330,7 @@ Route::resource('roles', RoleController::class);
 *settings
 */
 
-//! Route for Profile Settings
+// Route for Profile Settings
 Route::controller(ProfileController::class)->group(function () {
     Route::get('setting/profile', 'index')->name('setting.profile.index');
     Route::put('setting/profile/update', 'UpdateProfile')->name('setting.profile.update');
@@ -312,43 +338,43 @@ Route::controller(ProfileController::class)->group(function () {
     Route::post('setting/profile/update/Picture', 'UpdateProfilePicture')->name('update.profile.picture');
 });
 
-//! Route for Mail Settings
+// Route for Mail Settings
 Route::controller(MailSettingController::class)->group(function () {
     Route::get('setting/mail', 'index')->name('setting.mail.index');
     Route::patch('setting/mail', 'update')->name('setting.mail.update');
 });
 
-//! Route for Stripe Settings
+// Route for Stripe Settings
 Route::controller(StripeController::class)->prefix('setting/stripe')->name('setting.stripe.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::patch('/update', 'update')->name('update');
 });
 
-//! Route for Firebase Settings
+// Route for Firebase Settings
 Route::controller(FirebaseController::class)->prefix('setting/firebase')->name('setting.firebase.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::patch('/update', 'update')->name('update');
 });
 
-//! Route for Firebase Settings
+// Route for Firebase Settings
 Route::controller(SocialController::class)->prefix('setting/social')->name('setting.social.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::patch('/update', 'update')->name('update');
 });
 
-//! Route for Stripe Settings
+// Route for Stripe Settings
 Route::controller(SettingController::class)->group(function () {
     Route::get('setting/general', 'index')->name('setting.general.index');
     Route::patch('setting/general', 'update')->name('setting.general.update');
 });
 
-//! Route for Google Map Settings
+// Route for Google Map Settings
 Route::controller(GoogleMapController::class)->group(function () {
     Route::get('setting/google/map', 'index')->name('setting.google.map.index');
     Route::patch('setting/google/map', 'update')->name('setting.google.map.update');
 });
 
-//! Route for Google Map Settings
+// Route for Google Map Settings
 Route::controller(CaptchaController::class)->group(function () {
     Route::get('setting/captcha', 'index')->name('setting.captcha.index');
     Route::patch('setting/captcha', 'update')->name('setting.captcha.update');

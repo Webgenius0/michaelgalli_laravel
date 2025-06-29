@@ -40,37 +40,48 @@
                                         <div class="col-md-6">
 
                                             <div class="form-group">
-                                                <label for="name" class="form-label">Name:</label>
-                                                <input type="text"
-                                                    class="form-control @error('name') is-invalid @enderror" name="name"
-                                                    placeholder="Enter Name" id="" value="{{ old('name') }}">
-                                                @error('name')
+                                                <label for="meal_plan_id">Meal Plan</label>
+                                                <select class="form-control @error('meal_plan_id') is-invalid @enderror"
+                                                    name="meal_plan_id" id="meal_plan_id">
+                                                    <option>Select</option>
+                                                    @foreach ($meal_plans as $meal_plan)
+                                                        <option value="{{ $meal_plan->id }}">{{ $meal_plan->name }}
+                                                            ({{ $meal_plan->people_count }} People)
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('meal_plan_id')
                                                     <span class="text-danger">{{ $message }}</span>
                                                 @enderror
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="people_count" class="form-label">Number of People</label>
+                                                <label for="recipes_per_week" class="form-label">Recipes per Week</label>
                                                 <input type="number"
-                                                    class="form-control @error('people_count') is-invalid @enderror"
-                                                    name="people_count" placeholder="Enter number of people "
-                                                    id="" value="{{ old('people_count') }}">
-                                                @error('people_count')
+                                                    class="form-control @error('recipes_per_week') is-invalid @enderror"
+                                                    name="recipes_per_week" placeholder="Enter recipe per week "
+                                                    id="" value="{{ old('recipes_per_week') }}">
+                                                @error('recipes_per_week')
                                                     <span class="text-danger">{{ $message }}</span>
                                                 @enderror
                                             </div>
 
 
 
-
-
+                                            <div class="form-group">
+                                                <label for="price_per_serving" class="form-label">
+                                                    Price per Serving (AED)
+                                                </label>
+                                                <input type="number"
+                                                    class="form-control @error('price_per_serving') is-invalid @enderror"
+                                                    name="price_per_serving" placeholder="Enter recipe per week "
+                                                    id="" value="{{ old('price_per_serving') }}">
+                                                @error('price_per_serving')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
+                                            </div>
                                         </div>
-
-
                                     </div>
-
-
-
 
                                     <!-- Submit Button -->
                                     <div class="form-group" style="clear: both;">
@@ -89,5 +100,4 @@
 @endsection
 
 @push('scripts')
-
 @endpush

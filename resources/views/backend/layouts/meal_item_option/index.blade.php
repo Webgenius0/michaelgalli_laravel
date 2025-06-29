@@ -35,7 +35,7 @@
                             <div class="card-header border-bottom">
                                 <h3 class="card-title mb-0">List</h3>
                                 <div class="card-options ms-auto">
-                                    <a href="{{ route('admin.meal_plan.create') }}" class="btn btn-primary btn-sm">Add</a>
+                                    <a href="{{ route('admin.meal_plan_option.create') }}" class="btn btn-primary btn-sm">Add</a>
                                 </div>
                             </div>
                             <div class="card-body">
@@ -102,7 +102,7 @@
                     pagingType: "full_numbers",
                     dom: "<'row justify-content-between table-topbar'<'col-md-4 col-sm-3'l><'col-md-5 col-sm-5 px-0'f>>tipr",
                     ajax: {
-                        url: "{{ route('admin.meal_plan.index') }}",
+                        url: "{{ route('admin.meal_plan_option.index') }}",
                         type: "GET",
                     },
 
@@ -125,10 +125,6 @@
                             orderable: true,
                             searchable: true
                         },
-
-
-
-
 
                         {
                             data: 'action',
@@ -200,7 +196,7 @@
         // Delete Button
         function deleteItem(id) {
             NProgress.start();
-            let url = "{{ route('admin.meal_plan.destroy', ':id') }}";
+            let url = "{{ route('admin.meal_plan_option.destroy', ':id') }}";
             let csrfToken = '{{ csrf_token() }}';
             $.ajax({
                 type: "DELETE",
@@ -222,7 +218,7 @@
 
         //edit
         function goToEdit(id) {
-            let url = "{{ route('admin.meal_plan.edit', ':id') }}";
+            let url = "{{ route('admin.meal_plan_option.edit', ':id') }}";
             window.location.href = url.replace(':id', encodeURIComponent(id));
         }
 
@@ -231,7 +227,7 @@
 
         // View (Show)
         function goToOpen(id) {
-            let url = "{{ route('admin.meal_plan.show', ':id') }}";
+            let url = "{{ route('admin.meal_plan_option.show', ':id') }}";
             window.location.href = url.replace(':id', encodeURIComponent(id));
         }
     </script>

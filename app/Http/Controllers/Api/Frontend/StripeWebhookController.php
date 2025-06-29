@@ -104,6 +104,7 @@ class StripeWebhookController extends Controller
 
                         // if (! empty($recipeIds)) {
                         $recipes = Recipe::whereIn('id', $recipeIds)->get();
+                        Log::info("Recipe List: ", $recipes);
                         // } else {
                         //     $recipes = Recipe::inRandomOrder()
                         //         ->take($mealPlan->recipes_per_week)

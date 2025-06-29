@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('meal_plans', function (Blueprint $table) {
-
+        Schema::create('meal_plan_options', function (Blueprint $table) {
 
             $table->id();
-            $table->string('name');
-            $table->unsignedTinyInteger('people_count'); // 1, 2, 3, 4
+            $table->foreignId('meal_plan_id')->constrained()->onDelete('cascade');
+            $table->unsignedTinyInteger('recipes_per_week'); // 3, 4, 5, etc.
+            $table->decimal('price_per_serving', 8, 2);      // e.g., 30.00
             $table->timestamps();
-
 
         });
     }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('meal_plans');
+        Schema::dropIfExists('meal_plan_options');
     }
 };
