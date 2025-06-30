@@ -54,9 +54,6 @@ class SubscriptionController extends Controller
 
     public function package_select(Request $request)
     {
-
-        // validation list
-
         $validator = Validator::make($request->all(), [
             'meal_plan_id'        => 'required|exists:meal_plans,id',
             'meal_plan_option_id' => 'required|exists:meal_plan_options,id',
