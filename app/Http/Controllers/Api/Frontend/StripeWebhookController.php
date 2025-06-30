@@ -1,19 +1,20 @@
 <?php
 namespace App\Http\Controllers\Api\Frontend;
 
-use App\Http\Controllers\Controller;
-use App\Models\MealPlan;
-use App\Models\Recipe;
-use App\Models\Subscription;
-use App\Models\SubscriptionFamilyMember;
+use OpenAI;
+use Stripe\Webhook;
 use App\Models\User;
-use App\Models\UserFamilyMember;
+use App\Models\Recipe;
+use App\Models\MealPlan;
+use Stripe\StripeClient;
+use App\Models\Subscription;
+use App\Models\UserPlanCart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use App\Models\UserFamilyMember;
 use Illuminate\Support\Facades\Log;
-use OpenAI;
-use Stripe\StripeClient;
-use Stripe\Webhook;
+use App\Http\Controllers\Controller;
+use App\Models\SubscriptionFamilyMember;
 
 class StripeWebhookController extends Controller
 {
@@ -55,11 +56,13 @@ class StripeWebhookController extends Controller
                     $stripe       = new StripeClient(config('services.stripe.secret'));
                     $subscription = $stripe->subscriptions->retrieve($session->subscription);
 
+                    $cart = UserPlanCart::where('user_id', $user->id)->first();
+
                     $sub = Subscription::updateOrCreate(
                         ['stripe_subscription_id' => $subscription->id],
                         [
                             'user_id'       => $user->id,
-                            'meal_plan_id'  => $session->metadata->meal_plan_id ?? null,
+                            'meal_plan_id'  => $cart->meal_plan_id ?? null,
                             'type'          => 'stripe',
                             'stripe_status' => $subscription->status,
                             'stripe_price'  => $subscription->items->data[0]->price->id ?? null,
@@ -103,17 +106,17 @@ class StripeWebhookController extends Controller
                         $recipeIds       = array_filter(explode(',', $recipeIdsString));
 
                         // if (! empty($recipeIds)) {
-                        $recipes = Recipe::whereIn('id', $recipeIds)->get();
-                        Log::info("Recipe List: ", $recipes);
+                        // $recipes = Recipe::whereIn('id', $recipeIds)->get();
+                        // Log::info("Recipe List: ", $recipes);
                         // } else {
                         //     $recipes = Recipe::inRandomOrder()
                         //         ->take($mealPlan->recipes_per_week)
                         //         ->get();
                         // }
 
-                        // $recipes = Recipe::inRandomOrder()
-                        //     ->take(3)
-                        //     ->get();
+                        $recipes = Recipe::inRandomOrder()
+                            ->take(3)
+                            ->get();
 
                         $order = $user->orders()->create([
                             'week_start' => $weekStart,

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('subscriptions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id');
-            // meal plan id 
+            // meal plan id
             $table->foreignId('meal_plan_id')->nullable()->constrained('meal_plans')->nullOnDelete();
 
             $table->string('type');

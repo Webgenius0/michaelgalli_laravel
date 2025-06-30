@@ -52,18 +52,18 @@ class SubscriptionController extends Controller
         ], 200);
     }
 
-    public function add_to_cart(Request $request)
+    public function package_select(Request $request)
     {
 
         $validator = Validator::make($request->all(), [
             'meal_plan_id'        => 'required|exists:meal_plans,id',
             'meal_plan_option_id' => 'required|exists:meal_plan_options,id',
 
-            'member_ids'          => 'required|array',
-            'member_ids'          => 'required|exists:user_family_members,id',
+            'member_ids'          => 'nullable|array',
+            'member_ids'          => 'nullable|exists:user_family_members,id',
 
-            'recipe_ids'          => 'required|array',
-            'recipe_ids'          => 'required|exists:recipes,id',
+            // 'recipe_ids'          => 'required|array',
+            // 'recipe_ids'          => 'required|exists:recipes,id',
 
         ]);
 
@@ -115,10 +115,11 @@ class SubscriptionController extends Controller
             ]
         );
 
+        $family_cart = [];
         // user family cart create or update
         if (is_array($request->member_ids)) {
             foreach ($request->member_ids as $member_id) {
-                UserFamilyCart::updateOrCreate(
+                $family_cart[] = UserFamilyCart::updateOrCreate(
                     [
                         'user_id'               => $user->id,
                         'user_family_member_id' => $member_id,
@@ -128,9 +129,128 @@ class SubscriptionController extends Controller
         }
 
         // user recipee cart create and update
+        // if (is_array($request->recipe_ids)) {
+        //     foreach ($request->recipe_ids as $recipe_id) {
+        //         UserRecipeCart::updateOrCreate(
+        //             [
+        //                 'user_id'   => $user->id,
+        //                 'recipe_id' => $recipe_id,
+        //             ]
+        //         );
+        //     }
+        // }
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Recipe addded to cart successfully.',
+            'data'    => [
+                'cart'        => $cart,
+                'family_cart' => $family_cart,
+
+            ],
+        ], 200);
+
+    }
+
+    public function selected_package(Request $request)
+    {
+        $user = auth('api')->user();
+
+        // Fetch cart data
+        $cart = UserPlanCart::where('user_id', $user->id)->first();
+        if (! $cart) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'No cart found for user.',
+                'data'    => [],
+            ], 404);
+        }
+
+        $meal_plan = MealPlan::find($cart->meal_plan_id);
+        if (! $meal_plan) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Meal plan not found .',
+                'data'    => [],
+            ], 404);
+        }
+
+        // Get member_ids from UserFamilyCart
+        $member_ids = UserFamilyCart::where('user_id', $user->id)->get();
+
+        // Get recipe_ids from UserRecipeCart
+
+        $recipe_ids = 0;
+        $recipe_ids = UserRecipeCart::where('user_id', $user->id)->get();
+
+        if (empty($member_ids) || empty($recipe_ids)) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Cart must have at least one member and one recipe.',
+                'data'    => [],
+            ], 422);
+        }
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Checkout session created successfully.',
+            'data'    => [
+                'plan'             => $cart,
+                'selected_members' => $member_ids,
+                'selected_recipes' => $recipe_ids ?? 0,
+            ],
+        ], 200);
+    }
+
+    public function add_to_cart(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+
+            'recipe_ids' => 'required|array',
+            'recipe_ids' => 'required|exists:recipes,id',
+
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => false,
+                'message' => $validator->errors()->first(),
+                'data'    => [],
+            ], 422);
+        }
+
+        $user = auth('api')->user();
+
+        $recipe_cart = [];
+
+        $user_plan = UserPlanCart::where('user_id', $user->id)->first();
+
+        $recipe_limit = $user_plan->recipes_per_week;
+
+        // check how many recipes the user has already added this week
+        $already_added = UserRecipeCart::where('user_id', $user->id)
+            ->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
+            ->count();
+
+        // count how many recipes the user is trying to add now
+        $new_recipe_count = is_array($request->recipe_ids) ? count($request->recipe_ids) : 0;
+
+        // total after adding
+        $total_after_adding = $already_added + $new_recipe_count;
+
+        if ($total_after_adding > $recipe_limit) {
+            return response()->json([
+                'status'  => false,
+                'message' => "You can only select up to {$recipe_limit} recipes per week. You have already added {$already_added}.",
+                'data' => []
+            ], 400);
+        }
+
+        // user recipee cart create and update
         if (is_array($request->recipe_ids)) {
             foreach ($request->recipe_ids as $recipe_id) {
-                UserRecipeCart::updateOrCreate(
+                $recipe_cart[] = UserRecipeCart::create(
                     [
                         'user_id'   => $user->id,
                         'recipe_id' => $recipe_id,
@@ -143,7 +263,8 @@ class SubscriptionController extends Controller
             'status'  => true,
             'message' => 'Recipe addded to cart successfully.',
             'data'    => [
-                'cart' => $cart,
+
+                'recipe_cart' => $recipe_cart,
 
             ],
         ], 200);
@@ -165,7 +286,7 @@ class SubscriptionController extends Controller
         }
 
         $meal_plan = MealPlan::find($cart->meal_plan_id);
-        if (! $meal_plan ) {
+        if (! $meal_plan) {
             return response()->json([
                 'status'  => false,
                 'message' => 'Meal plan not found .',
