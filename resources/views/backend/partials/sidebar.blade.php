@@ -192,8 +192,17 @@
                     </a>
 
                     <ul class="slide-menu">
-                        <li><a href="{{ route('admin.cms.home.banner.index') }}" class="slide-item">How it work(Section)</a></li>
+                        <li><a href="{{ route('admin.cms.home.banner.index') }}" class="slide-item">HOME</a></li>
                     </ul>
+
+                    <ul class="slide-menu">
+                        <li><a href="{{ route('admin.cms.home.how_it_work.index') }}" class="slide-item">
+                            How it work(Section)
+                        </a></li>
+                    </ul>
+
+
+
                 </li>
 
 

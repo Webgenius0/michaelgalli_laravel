@@ -34,6 +34,7 @@ use App\Http\Controllers\Web\Backend\Settings\FirebaseController;
 use App\Http\Controllers\Web\Backend\Settings\GoogleMapController;
 use App\Http\Controllers\Web\Backend\Settings\MailSettingController;
 use App\Http\Controllers\Web\Backend\CMS\Web\Home\HomeBannerController;
+use App\Http\Controllers\Web\Backend\CMS\Web\Home\HomeHowToWorkController;
 use App\Http\Controllers\Web\Backend\MealPlanOptionController;
 use App\Http\Controllers\Web\Backend\SubscriptionFeatureController;
 
@@ -283,6 +284,20 @@ Route::prefix('cms')->name('cms.')->group(function () {
 
     //Home Banner
     Route::prefix('home/banner')->name('home.banner.')->controller(HomeBannerController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{id}', 'show')->name('show');
+        Route::get('/{id}/edit', 'edit')->name('edit');
+        Route::patch('/{id}', 'update')->name('update');
+        Route::delete('/{id}', 'destroy')->name('destroy');
+        Route::get('/{id}/status', 'status')->name('status');
+
+        Route::put('/content', 'content')->name('content');
+    });
+
+    //Home Banner
+    Route::prefix('home/how_it_work')->name('home.how_it_work.')->controller(HomeHowToWorkController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
