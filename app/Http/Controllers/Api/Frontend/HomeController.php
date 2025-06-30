@@ -7,6 +7,7 @@ use App\Enums\PageEnum;
 use App\Enums\SectionEnum;
 use App\Helpers\Helper;
 use App\Models\CMS;
+use App\Models\CustomerReview;
 use App\Models\Setting;
 
 class HomeController extends Controller
@@ -25,7 +26,54 @@ class HomeController extends Controller
         // $data['common']         = CMS::where('page', PageEnum::COMMON)->where('status', 'active')->get();
         // $data['settings']       = Setting::first();
 
-        return Helper::jsonResponse(true, 'Home Page', 200, $data);
+        return Helper::jsonResponse(true, 'How to work', 200, $data);
+
+    }
+
+
+
+    public function home_section()
+    {
+        $data = [];
+
+        $cmsItems = CMS::where('page', PageEnum::HOME)
+                    ->where('status', 'active')
+                    ->whereIn('section', [SectionEnum::HOME_BANNER, SectionEnum::HOME_BANNERS])
+                    ->get();
+
+        $data['home_banner']    = $cmsItems->where('section', SectionEnum::HOME_BANNER)->first();
+        $data['home_banners']   = $cmsItems->where('section', SectionEnum::HOME_BANNERS)->values();
+        // $data['common']         = CMS::where('page', PageEnum::COMMON)->where('status', 'active')->get();
+        // $data['settings']       = Setting::first();
+
+        return Helper::jsonResponse(true, 'Home section', 200, $data);
+
+    }
+
+
+    public function personalized()
+    {
+        $data = [];
+
+        $cmsItems = CMS::where('page', PageEnum::HOME)
+                    ->where('status', 'active')
+                    ->whereIn('section', [SectionEnum::PERSONALIZED, SectionEnum::PERSONALIZEDS])
+                    ->get();
+
+        $data['personalized']    = $cmsItems->where('section', SectionEnum::PERSONALIZED)->first();
+        $data['personalizeds']   = $cmsItems->where('section', SectionEnum::PERSONALIZEDS)->values();
+        // $data['common']         = CMS::where('page', PageEnum::COMMON)->where('status', 'active')->get();
+        // $data['settings']       = Setting::first();
+
+        return Helper::jsonResponse(true, 'Home section', 200, $data);
+
+    }
+
+
+    public function review()
+    {
+       $review = CustomerReview::all();
+        return Helper::jsonResponse(true, 'Customer review retrive ', 200, $review);
 
     }
 }

@@ -233,7 +233,7 @@ class SubscriptionController extends Controller
 
         $user_plan = UserPlanCart::where('user_id', $user->id)->first();
 
-        $recipe_limit = $user_plan->recipes_per_week;
+        $recipe_limit = $user_plan->recipes_per_week ?? 0;
 
         // check how many recipes the user has already added this week
         $already_added = UserRecipeCart::where('user_id', $user->id)
