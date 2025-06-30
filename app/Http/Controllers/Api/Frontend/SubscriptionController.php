@@ -212,69 +212,61 @@ class SubscriptionController extends Controller
     public function add_to_cart(Request $request)
     {
 
-        $validator = Validator::make($request->all(), [
-
-            'recipe_ids' => 'required|array',
-            'recipe_ids' => 'required|exists:recipes,id',
-
+        $request->validate([
+            'recipe_id' => 'required|integer|exists:recipes,id',
         ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status'  => false,
-                'message' => $validator->errors()->first(),
-                'data'    => [],
-            ], 422);
-        }
 
         $user = auth('api')->user();
 
-        $recipe_cart = [];
-
+        // Get user plan and recipe limit
         $user_plan = UserPlanCart::where('user_id', $user->id)->first();
+
+        if (! $user_plan) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'No active meal plan found.',
+            ], 400);
+        }
 
         $recipe_limit = $user_plan->recipes_per_week ?? 0;
 
-        // check how many recipes the user has already added this week
+        // Count already added recipes for the week
         $already_added = UserRecipeCart::where('user_id', $user->id)
             ->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
             ->count();
 
-        // count how many recipes the user is trying to add now
-        $new_recipe_count = is_array($request->recipe_ids) ? count($request->recipe_ids) : 0;
+        // Check if already exists
+        $already_exists = UserRecipeCart::where('user_id', $user->id)
+            ->where('recipe_id', $request->recipe_id)
+            ->exists();
 
-        // total after adding
-        $total_after_adding = $already_added + $new_recipe_count;
+        // if ($already_exists) {
+        //     return response()->json([
+        //         'status'  => false,
+        //         'message' => 'This recipe is already in your cart.',
+        //     ], 409);
+        // }
 
-        if ($total_after_adding > $recipe_limit) {
+        // Check limit
+        if ($already_added >= $recipe_limit) {
             return response()->json([
                 'status'  => false,
-                'message' => "You can only select up to {$recipe_limit} recipes per week. You have already added {$already_added}.",
-                'data'    => [],
-            ], 400);
+                'message' => "You have reached your weekly recipe limit of {$recipe_limit}.",
+                'data' => []
+            ], 403);
         }
 
-        // user recipee cart create and update
-        if (is_array($request->recipe_ids)) {
-            foreach ($request->recipe_ids as $recipe_id) {
-                $recipe_cart[] = UserRecipeCart::create(
-                    [
-                        'user_id'   => $user->id,
-                        'recipe_id' => $recipe_id,
-                    ]
-                );
-            }
-        }
+        // Add recipe
+        $recipe_cart = UserRecipeCart::create([
+            'user_id'   => $user->id,
+            'recipe_id' => $request->recipe_id,
+        ]);
 
         return response()->json([
             'status'  => true,
-            'message' => 'Recipe addded to cart successfully.',
-            'data'    => [
-
-                'recipe_cart' => $recipe_cart,
-
-            ],
-        ], 200);
+            'message' => 'Recipe added to cart successfully.',
+            'data'    => $recipe_cart,
+        ]);
 
     }
 
@@ -373,8 +365,8 @@ class SubscriptionController extends Controller
                     'quantity'   => 1,
                 ]],
                 'mode'        => 'subscription',
-                'success_url' => route('subscription.success', ['user_id' => auth('api')->id()]),
-                'cancel_url'  => route('subscription.cancel', ['user_id' => auth('api')->id()]),
+                'success_url' => 'https://nutri-craft.netlify.app/payment-success',
+                'cancel_url'  => 'https://nutri-craft.netlify.app/payment-cancel',
                 'metadata'    => [
                     'user_id'      => auth('api')->id(),
                     'meal_plan_id' => $meal_plan->id,
