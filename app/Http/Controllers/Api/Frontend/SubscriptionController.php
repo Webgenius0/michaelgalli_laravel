@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Api\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\BillingInformation;
 use App\Models\MealPlan;
 use App\Models\MealPlanOption;
 use App\Models\SubscriptionFeature;
@@ -191,8 +192,8 @@ class SubscriptionController extends Controller
             ->get()
             ->map(function ($item) {
                 return [
-                    'id'    => $item->recipe->id,
-                    'title'  => $item->recipe->title,
+                    'id'        => $item->recipe->id,
+                    'title'     => $item->recipe->title,
                     'image_url' => url($item->recipe->image_url),
                 ];
             });
@@ -246,8 +247,6 @@ class SubscriptionController extends Controller
         $already_exists = UserRecipeCart::where('user_id', $user->id)
             ->where('recipe_id', $request->recipe_id)
             ->exists();
-
-
 
         // Check limit
         if ($already_added >= $recipe_limit) {
@@ -314,6 +313,24 @@ class SubscriptionController extends Controller
 
     public function subscribe(Request $request)
     {
+        // dd($request->all());
+
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required|string',
+            'last_name'  => 'required|string',
+            'email'      => 'required',
+            'phone'      => 'required',
+
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => false,
+                'message' => $validator->errors()->first(),
+                'data'    => [],
+            ], 422);
+        }
+
         $user = auth('api')->user();
 
         // Fetch cart data
@@ -348,6 +365,24 @@ class SubscriptionController extends Controller
                 'data'    => [],
             ], 422);
         }
+
+        BillingInformation::updateOrCreate(
+            [
+                'user_id' => $user->id,
+            ],
+            [
+                'full_name' => $request->first_name . '' . $request->last_name,
+                'email'      => $request->email,
+                'phone'      => $request->phone,
+                // Add any other billing fields here, e.g.:
+                'address'    => $request->address,
+                'city'       => $request->city,
+                'state'      => $request->state,
+                'postal_code'=> $request->postal_code,
+                'country'    => $request->country,
+                'land_mark'    => $request->land_mark,
+            ]
+        );
 
         Stripe::setApiKey(config('services.stripe.secret'));
 
