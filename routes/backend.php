@@ -38,6 +38,7 @@ use App\Http\Controllers\Web\Backend\Settings\MailSettingController;
 use App\Http\Controllers\Web\Backend\CMS\Web\Home\HomeBannerController;
 use App\Http\Controllers\Web\Backend\CMS\Web\Home\HomeHowToWorkController;
 use App\Http\Controllers\Web\Backend\CMS\Web\Home\HomePersonalizedController;
+use App\Http\Controllers\Web\Backend\CustomerReviewController;
 
 Route::get("dashboard", [DashboardController::class, 'index'])->name('dashboard');
 
@@ -155,6 +156,26 @@ Route::controller(RecipeController::class)->prefix('recipe')->name('recipe.')->g
     Route::delete('/delete/{id}', 'destroy')->name('destroy');
     Route::get('/status/{id}', 'status')->name('status');
 });
+
+
+
+Route::controller(CustomerReviewController::class)->prefix('review')->name('review.')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('/create', 'create')->name('create');
+    Route::post('/store', 'store')->name('store');
+    Route::get('/show/{id}', 'show')->name('show');
+    Route::get('/edit/{id}', 'edit')->name('edit');
+    Route::post('/update/{id}', 'update')->name('update');
+    Route::delete('/delete/{id}', 'destroy')->name('destroy');
+    Route::get('/status/{id}', 'status')->name('status');
+});
+
+
+
+
+
+
+
 
 Route::controller(WeeklyRecipeController::class)->prefix('weekly-recipe')->name('weekly_recipe.')->group(function () {
     Route::get('/', 'index')->name('index');

@@ -208,6 +208,14 @@
                     </ul>
 
 
+                    <ul class="slide-menu">
+                        <li><a href="{{ route('admin.review.index') }}" class="slide-item">
+                            Customer Review(Section)
+                        </a></li>
+                    </ul>
+
+
+
 
                 </li>
 
