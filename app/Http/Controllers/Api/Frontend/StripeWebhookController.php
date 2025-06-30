@@ -1,20 +1,20 @@
 <?php
 namespace App\Http\Controllers\Api\Frontend;
 
-use OpenAI;
-use Stripe\Webhook;
-use App\Models\User;
-use App\Models\Recipe;
+use App\Http\Controllers\Controller;
 use App\Models\MealPlan;
-use Stripe\StripeClient;
+use App\Models\Recipe;
 use App\Models\Subscription;
+use App\Models\SubscriptionFamilyMember;
+use App\Models\User;
+use App\Models\UserFamilyMember;
 use App\Models\UserPlanCart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use App\Models\UserFamilyMember;
 use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Controller;
-use App\Models\SubscriptionFamilyMember;
+use OpenAI;
+use Stripe\StripeClient;
+use Stripe\Webhook;
 
 class StripeWebhookController extends Controller
 {
@@ -59,9 +59,10 @@ class StripeWebhookController extends Controller
                     $cart = UserPlanCart::where('user_id', $user->id)->first();
 
                     $sub = Subscription::updateOrCreate(
-                        ['stripe_subscription_id' => $subscription->id],
+                        ['stripe_subscription_id' => $subscription->id,
+                            'user_id'                 => $user->id,
+                        ],
                         [
-                            'user_id'       => $user->id,
                             'meal_plan_id'  => $cart->meal_plan_id ?? null,
                             'type'          => 'stripe',
                             'stripe_status' => $subscription->status,
