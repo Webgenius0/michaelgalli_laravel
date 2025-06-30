@@ -201,6 +201,12 @@
                         </a></li>
                     </ul>
 
+                     <ul class="slide-menu">
+                        <li><a href="{{ route('admin.cms.home.personalized.index') }}" class="slide-item">
+                            Personalized(Section)
+                        </a></li>
+                    </ul>
+
 
 
                 </li>

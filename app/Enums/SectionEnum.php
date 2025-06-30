@@ -12,6 +12,10 @@ enum SectionEnum: string
     case HOME_HOW_IT_WORK = 'home_how_it_work';
     case HOME_HOW_IT_WORKS = 'home_how_it_works';
 
+    case PERSONALIZED = 'personalized';
+    case PERSONALIZEDS = 'personalizeds';
+
+
     case HERO = 'hero';
     case HEROS = 'heros';
 
