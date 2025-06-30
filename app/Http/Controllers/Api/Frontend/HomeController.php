@@ -11,17 +11,17 @@ use App\Models\Setting;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function how_work()
     {
         $data = [];
 
         $cmsItems = CMS::where('page', PageEnum::HOME)
                     ->where('status', 'active')
-                    ->whereIn('section', [SectionEnum::HOME_BANNER, SectionEnum::HOME_BANNERS])
+                    ->whereIn('section', [SectionEnum::HOME_HOW_IT_WORK, SectionEnum::HOME_HOW_IT_WORKS])
                     ->get();
 
-        $data['how_it_work']    = $cmsItems->where('section', SectionEnum::HOME_BANNER)->first();
-        $data['how_it_works']   = $cmsItems->where('section', SectionEnum::HOME_BANNERS)->values();
+        $data['how_it_work']    = $cmsItems->where('section', SectionEnum::HOME_HOW_IT_WORK)->first();
+        $data['how_it_works']   = $cmsItems->where('section', SectionEnum::HOME_HOW_IT_WORKS)->values();
         // $data['common']         = CMS::where('page', PageEnum::COMMON)->where('status', 'active')->get();
         // $data['settings']       = Setting::first();
 

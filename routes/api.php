@@ -229,5 +229,6 @@ Route::middleware(['auth:api'])->controller(ChatController::class)->prefix('auth
 */
 
 Route::prefix('cms')->name('cms.')->group(function () {
-    Route::get('home/how-it-works', [HomeController::class, 'index'])->name('home');
+    Route::get('home/how-it-works', [HomeController::class, 'how_work']);
+    Route::get('home/section', [HomeController::class, 'home_section'])->name('home');
 });
