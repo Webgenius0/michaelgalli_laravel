@@ -32,7 +32,8 @@ class UserProfileController extends Controller
             'age'          => $user->age,
             'height'       => $user->height,
             'weight'       => $user->weight,
-            'delivery_address' => $user->deliveryAddresses
+            'delivery_address' => $user->deliveryAddresses,
+            'family_members' => $user->familyMembers,
         ];
 
 
