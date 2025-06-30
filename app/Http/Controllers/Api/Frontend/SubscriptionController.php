@@ -177,20 +177,27 @@ class SubscriptionController extends Controller
         if (! $meal_plan) {
             return response()->json([
                 'status'  => false,
-                'message' => 'Meal plan not found .',
+                'message' => 'Meal plan not found.',
                 'data'    => [],
             ], 404);
         }
 
-        // Get member_ids from UserFamilyCart
-        $member_ids = UserFamilyCart::where('user_id', $user->id)->get();
+        // Get selected members
+        $selected_members = UserFamilyCart::where('user_id', $user->id)->get();
 
-        // Get recipe_ids from UserRecipeCart
+        // Get selected recipes with details (name, image, etc.)
+        $selected_recipes = UserRecipeCart::where('user_id', $user->id)
+            ->with('recipe:id,title,image_url') // eager load only necessary fields
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id'    => $item->recipe->id,
+                    'title'  => $item->recipe->title,
+                    'image_url' => url($item->recipe->image_url),
+                ];
+            });
 
-        $recipe_ids = 0;
-        $recipe_ids = UserRecipeCart::where('user_id', $user->id)->get();
-
-        if (empty($member_ids) || empty($recipe_ids)) {
+        if ($selected_members->isEmpty() || $selected_recipes->isEmpty()) {
             return response()->json([
                 'status'  => false,
                 'message' => 'Cart must have at least one member and one recipe.',
@@ -203,8 +210,8 @@ class SubscriptionController extends Controller
             'message' => 'Checkout session created successfully.',
             'data'    => [
                 'plan'             => $cart,
-                'selected_members' => $member_ids,
-                'selected_recipes' => $recipe_ids ?? 0,
+                'selected_members' => $selected_members,
+                'selected_recipes' => $selected_recipes,
             ],
         ], 200);
     }
@@ -252,7 +259,7 @@ class SubscriptionController extends Controller
             return response()->json([
                 'status'  => false,
                 'message' => "You have reached your weekly recipe limit of {$recipe_limit}.",
-                'data' => []
+                'data'    => [],
             ], 403);
         }
 
