@@ -187,7 +187,7 @@ class SubscriptionController extends Controller
 
         // Get selected recipes with details (name, image, etc.)
         $selected_recipes = UserRecipeCart::where('user_id', $user->id)
-            ->with('recipe:id,title,image_url') // eager load only necessary fields
+            ->with('recipe:id,title,image_url')
             ->get()
             ->map(function ($item) {
                 return [
@@ -197,13 +197,13 @@ class SubscriptionController extends Controller
                 ];
             });
 
-        if ($selected_members->isEmpty() || $selected_recipes->isEmpty()) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Cart must have at least one member and one recipe.',
-                'data'    => [],
-            ], 422);
-        }
+        // if ($selected_members->isEmpty() || $selected_recipes->isEmpty()) {
+        //     return response()->json([
+        //         'status'  => false,
+        //         'message' => 'Cart must have at least one member and one recipe.',
+        //         'data'    => [],
+        //     ], 422);
+        // }
 
         return response()->json([
             'status'  => true,
@@ -247,12 +247,7 @@ class SubscriptionController extends Controller
             ->where('recipe_id', $request->recipe_id)
             ->exists();
 
-        // if ($already_exists) {
-        //     return response()->json([
-        //         'status'  => false,
-        //         'message' => 'This recipe is already in your cart.',
-        //     ], 409);
-        // }
+
 
         // Check limit
         if ($already_added >= $recipe_limit) {
