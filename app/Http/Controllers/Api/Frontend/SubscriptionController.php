@@ -95,6 +95,14 @@ class SubscriptionController extends Controller
 
         $user = auth('api')->user();
 
+        // Check if user already has recipes in their cart
+        $hasRecipes = UserRecipeCart::where('user_id', $user->id)->exists();
+
+        // If recipes exist, delete them
+        if ($hasRecipes) {
+            UserRecipeCart::where('user_id', $user->id)->delete();
+        }
+
         $total_servings = $meal_plan->people_count * $meal_plan_option->recipes_per_week;
         $total_price    = $total_servings * $meal_plan_option->price_per_serving;
 
@@ -243,7 +251,7 @@ class SubscriptionController extends Controller
             return response()->json([
                 'status'  => false,
                 'message' => "You can only select up to {$recipe_limit} recipes per week. You have already added {$already_added}.",
-                'data' => []
+                'data'    => [],
             ], 400);
         }
 
@@ -268,6 +276,46 @@ class SubscriptionController extends Controller
 
             ],
         ], 200);
+
+    }
+
+    public function remove_to_cart(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+
+            'recipe_id' => 'required|integer|exists:user_recipe_carts,recipe_id',
+
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => false,
+                'message' => $validator->errors()->first(),
+                'data'    => [],
+            ], 422);
+        }
+
+        $user = auth('api')->user();
+
+        // Find and delete the recipe from the user's cart
+        $deleted = UserRecipeCart::where('user_id', $user->id)
+            ->where('recipe_id', $request->recipe_id)
+            ->first();
+        $deleted->delete();
+
+        if ($deleted) {
+            return response()->json([
+                'status'  => true,
+                'message' => 'Recipe removed from cart successfully.',
+                'data'    => $deleted,
+            ]);
+        }
+
+        return response()->json([
+            'status'  => false,
+            'message' => 'Recipe not found in your cart.',
+        ], 404);
 
     }
 

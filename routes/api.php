@@ -164,6 +164,7 @@ Route::middleware(['auth:api'])->controller(SubscriptionController::class)->pref
 
     Route::post('/package/selection', 'package_select');
     Route::post('/recipe/add-to-cart', 'add_to_cart');
+    Route::post('/recipe/remove-to-cart', 'remove_to_cart');
     Route::get('/package/view', 'selected_package');
 
 
