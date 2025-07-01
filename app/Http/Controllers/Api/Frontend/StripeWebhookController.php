@@ -97,7 +97,7 @@ class StripeWebhookController extends Controller
 
                     $user              = $subscription->user;
                     $user_recipe_carts = UserRecipeCart::where('user_id', $user->id)->get();
-                    Log::info('New user Recipe list: ', $user_recipe_carts);
+                    Log::info('New user Recipe list: '. $user_recipe_carts);
 
                     $mealPlan = MealPlan::find($subscription->meal_plan_id);
 
@@ -108,7 +108,7 @@ class StripeWebhookController extends Controller
 
                         $recipes = Recipe::where('id', $user_recipe_carts->recipe_id)->get();
 
-                        Log::info('New Recipe list: ', $recipes);
+                        Log::info('New Recipe list: '.$recipes);
 
                         $user_plan_carts = UserPlanCart::where('user_id', $user)->first();
 
