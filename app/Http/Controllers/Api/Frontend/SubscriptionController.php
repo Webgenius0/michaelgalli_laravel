@@ -549,14 +549,16 @@ class SubscriptionController extends Controller
 
         $features = SubscriptionFeature::first();
 
+        $user_plan = UserPlanCart::where('user_id', $user->id)->first();
+
         $data = [
             'plan_name'     => $plan->name,       // e.g., Family Plan
-            'price'         => $total_price ?? 0, // e.g., 100.00
+            'price'         => $user_plan->total_price ?? 0, // e.g., 100.00
             'currency'      => $plan->currency ?? 'AED',
             'billing_cycle' => $plan->billing_cycle ?? 'weekly', // weekly, monthly etc.
                                                                  // 'servings'      => $plan->servings_per_week,         // e.g., 16
-            'meals'         => $plan->recipes_per_week,          // e.g., 4
-            'people'        => $plan->people ?? 4,
+            'meals'         => $user_plan->recipes_per_week,          // e.g., 4
+            'people'        => $user_plan->people_count ?? 4,
 
             'features'      => [
                 'main_feature'    => $features->description,
