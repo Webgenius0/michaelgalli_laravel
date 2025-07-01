@@ -1,22 +1,22 @@
 <?php
 namespace App\Http\Controllers\Api\Frontend;
 
-use OpenAI;
-use Stripe\Webhook;
-use App\Models\User;
-use App\Models\Recipe;
+use App\Http\Controllers\Controller;
 use App\Models\MealPlan;
-use Stripe\StripeClient;
+use App\Models\OrderIngredient;
+use App\Models\Recipe;
 use App\Models\Subscription;
+use App\Models\SubscriptionFamilyMember;
+use App\Models\User;
+use App\Models\UserFamilyMember;
 use App\Models\UserPlanCart;
+use App\Models\UserRecipeCart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use App\Models\OrderIngredient;
-use App\Models\UserFamilyMember;
 use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Controller;
-use App\Models\SubscriptionFamilyMember;
-use App\Models\UserRecipeCart;
+use OpenAI;
+use Stripe\StripeClient;
+use Stripe\Webhook;
 
 class StripeWebhookController extends Controller
 {
@@ -95,23 +95,20 @@ class StripeWebhookController extends Controller
 
                 if ($subscription && $subscription->stripe_status === 'active') {
 
-                    $user     = $subscription->user;
+                    $user              = $subscription->user;
+                    $user_recipe_carts = UserRecipeCart::where('user_id', $user->id)->get();
+                    Log::info('New user Recipe list: ', $user_recipe_carts);
+
                     $mealPlan = MealPlan::find($subscription->meal_plan_id);
 
                     $weekStart  = now()->startOfWeek();
                     $totalPrice = $mealPlan->recipes_per_week * $mealPlan->price_per_recipe;
 
-
-                    if (!$user->orders()->where('week_start', $weekStart)->exists() && $mealPlan) {
-
-
-                        $user_recipe_carts = UserRecipeCart::where('user_id', $user->id)->get();
-                        Log::info('New user Recipe list: ', $user_recipe_carts);
+                    if (! $user->orders()->where('week_start', $weekStart)->exists() && $mealPlan) {
 
                         $recipes = Recipe::where('id', $user_recipe_carts->recipe_id)->get();
 
                         Log::info('New Recipe list: ', $recipes);
-
 
                         $user_plan_carts = UserPlanCart::where('user_id', $user)->first();
 
@@ -121,7 +118,6 @@ class StripeWebhookController extends Controller
                             'price'      => $totalPrice,
                             // 'pric'
                         ]);
-
 
                         foreach ($recipes as $recipe) {
 
