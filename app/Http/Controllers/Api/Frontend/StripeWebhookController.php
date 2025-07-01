@@ -129,21 +129,25 @@ class StripeWebhookController extends Controller
                             $ingredients = $recipe->ingredientSections;
                             $members     = $subscription->familyMembers;
 
-                            foreach ($ingredients as $ingredient) {
-                                foreach ($members as $member) {
-                                    $preferences      = $this->getDietaryPreferences($member);
-                                    $preferenceString = implode(', ', $preferences);
-                                    $swapResult       = $this->swapIngredientWithAI($ingredient->title, $preferenceString);
-                                    $order_ingredient = \App\Models\OrderIngredient::create([
-                                        'order_id'              => $order->id,
-                                        'recipe_id'             => $recipe->id,
-                                        'user_family_member_id' => $member->id,
-                                        'original_ingredient'   => $ingredient->title,
-                                        'swapped_ingredient'    => $swapResult['swap'],
-                                        'reason'                => $swapResult['reason'],
-                                    ]);
+                            foreach ($ingredients as $ingredientSection) {
+                                foreach ($ingredientSection->ingredients as $ingredient) {
+                                    foreach ($members as $member) {
+                                        $preferences      = $this->getDietaryPreferences($member);
+                                        $preferenceString = implode(', ', $preferences);
+                                        $swapResult       = $this->swapIngredientWithAI($ingredient->name, $preferenceString);
+
+                                        \App\Models\OrderIngredient::create([
+                                            'order_id'              => $order->id,
+                                            'recipe_id'             => $recipe->id,
+                                            'user_family_member_id' => $member->id,
+                                            'original_ingredient'   => $ingredient->name,
+                                            'swapped_ingredient'    => $swapResult['swap'],
+                                            'reason'                => $swapResult['reason'],
+                                        ]);
+                                    }
                                 }
                             }
+
                         }
 
                     }
