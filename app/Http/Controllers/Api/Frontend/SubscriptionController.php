@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BillingInformation;
 use App\Models\MealPlan;
 use App\Models\MealPlanOption;
+use App\Models\Recipe;
 use App\Models\SubscriptionFeature;
 use App\Models\UserFamilyCart;
 use App\Models\UserPlanCart;
@@ -357,7 +358,7 @@ class SubscriptionController extends Controller
 
         // Get recipe_ids from UserRecipeCart
         $recipe_ids = UserRecipeCart::where('user_id', $user->id)->pluck('recipe_id')->toArray();
-        // dd($recipe_ids);
+
 
         if (empty($member_ids) || empty($recipe_ids)) {
             return response()->json([

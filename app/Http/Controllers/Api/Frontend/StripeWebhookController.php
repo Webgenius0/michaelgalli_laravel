@@ -1,20 +1,21 @@
 <?php
 namespace App\Http\Controllers\Api\Frontend;
 
-use App\Http\Controllers\Controller;
-use App\Models\MealPlan;
-use App\Models\Recipe;
-use App\Models\Subscription;
-use App\Models\SubscriptionFamilyMember;
+use OpenAI;
+use Stripe\Webhook;
 use App\Models\User;
-use App\Models\UserFamilyMember;
+use App\Models\Recipe;
+use App\Models\MealPlan;
+use Stripe\StripeClient;
+use App\Models\Subscription;
 use App\Models\UserPlanCart;
 use Illuminate\Http\Request;
+use App\Models\UserRecipeCart;
 use Illuminate\Support\Carbon;
+use App\Models\UserFamilyMember;
 use Illuminate\Support\Facades\Log;
-use OpenAI;
-use Stripe\StripeClient;
-use Stripe\Webhook;
+use App\Http\Controllers\Controller;
+use App\Models\SubscriptionFamilyMember;
 
 class StripeWebhookController extends Controller
 {
@@ -101,23 +102,12 @@ class StripeWebhookController extends Controller
 
                     if (! $user->orders()->where('week_start', $weekStart)->exists() && $mealPlan) {
 
-                        // যদি customer checkout করার সময় ৩টি recipe নির্বাচন করে এবং Stripe Checkout Session এর metadata তে recipe IDs পাঠানো হয় (যেমন: recipe_ids = 5,9,13), তাহলে আপনি এই metadata থেকে ওই IDs read করে সেই অনুযায়ী $recipes পাবেন।
 
-                        $recipeIdsString = $invoice->metadata->recipe_ids ?? '';
-                        $recipeIds       = array_filter(explode(',', $recipeIdsString));
+                        $recipe_ids = UserRecipeCart::where('user_id', $user->id)->pluck('recipe_id')->toArray();
 
-                        // if (! empty($recipeIds)) {
-                        // $recipes = Recipe::whereIn('id', $recipeIds)->get();
-                        // Log::info("Recipe List: ", $recipes);
-                        // } else {
-                        //     $recipes = Recipe::inRandomOrder()
-                        //         ->take($mealPlan->recipes_per_week)
-                        //         ->get();
-                        // }
+                        $recipes = Recipe::whereIn('id', $recipe_ids)->get();
 
-                        $recipes = Recipe::inRandomOrder()
-                            ->take(3)
-                            ->get();
+                        $user_plan_cart = UserPlanCart::where('user_id', $user->id)->first();
 
                         $order = $user->orders()->create([
                             'week_start' => $weekStart,
@@ -131,7 +121,7 @@ class StripeWebhookController extends Controller
                             $order->recipes()->create([
                                 'recipe_id' => $recipe->id,
                                 'quantity'  => 1,
-                                'price'     => $mealPlan->price_per_recipe ?? 0,
+                                'price'     => $user_plan_cart->price_per_serving ?? 0,
                                 'status'    => 'completed',
                             ]);
 
