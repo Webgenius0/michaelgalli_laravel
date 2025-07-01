@@ -50,6 +50,44 @@ class HomeController extends Controller
 
     }
 
+    public function recipe_section()
+    {
+        $data = [];
+
+        $cmsItems = CMS::where('page', PageEnum::HOME)
+                    ->where('status', 'active')
+                    ->whereIn('section', [SectionEnum::HOME_RECIPE_PAGE, SectionEnum::HOME_RECIPE_PAGES])
+                    ->get();
+
+        $data['recipe_section']    = $cmsItems->where('section', SectionEnum::HOME_RECIPE_PAGE)->first();
+        $data['recipe_sections']   = $cmsItems->where('section', SectionEnum::HOME_RECIPE_PAGES)->values();
+        // $data['common']         = CMS::where('page', PageEnum::COMMON)->where('status', 'active')->get();
+        // $data['settings']       = Setting::first();
+
+        return Helper::jsonResponse(true, 'Recipe Page section', 200, $data);
+
+    }
+
+
+    public function contact_section()
+    {
+        $data = [];
+
+        $cmsItems = CMS::where('page', PageEnum::HOME)
+                    ->where('status', 'active')
+                    ->whereIn('section', [SectionEnum::HOME_CONTACT_US, SectionEnum::HOME_CONTACT_USS])
+                    ->get();
+
+        $data['contact_section']    = $cmsItems->where('section', SectionEnum::HOME_CONTACT_US)->first();
+        $data['contact_sections']   = $cmsItems->where('section', SectionEnum::HOME_CONTACT_USS)->values();
+        // $data['common']         = CMS::where('page', PageEnum::COMMON)->where('status', 'active')->get();
+        // $data['settings']       = Setting::first();
+
+        return Helper::jsonResponse(true, 'Contact Us Page section', 200, $data);
+
+    }
+
+
 
     public function personalized()
     {

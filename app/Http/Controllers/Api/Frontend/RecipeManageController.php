@@ -48,21 +48,32 @@ class RecipeManageController extends Controller
 
         $paginated = $recipes->orderBy('created_at', 'desc')->paginate($perPage);
 
+        $memberIds            = $request->query('member_ids', []);
+        $aiIngredientsEnabled = ! empty($memberIds);
+        $members              = [];
+
+        // if ($aiIngredientsEnabled) {
+        //     $members = auth('api')->user()->familyMembers()->whereIn('id', $memberIds)->get();
+        //     if ($members->isEmpty()) {
+        //         $aiIngredientsEnabled = false;
+        //     }
+        // }
+
         $data = [
-            'data' => collect($paginated->items())->map(function ($item) {
-                // Convert recipe image_url
+            'data' => collect($paginated->items())->map(function ($item) use ($aiIngredientsEnabled, $members) {
                 $item->image_url = $item->image_url ? asset($item->image_url) : null;
 
-                // Convert instruction image_urls without changing structure
+                // Format instruction images
                 if ($item->instructions && is_iterable($item->instructions)) {
                     foreach ($item->instructions as &$instruction) {
-                        if (! empty($instruction['image_url'])) {
-                            $instruction['image_url'] = asset($instruction['image_url']);
-                        } else {
-                            $instruction['image_url'] = null;
-                        }
+                        $instruction['image_url'] = ! empty($instruction['image_url']) ? asset($instruction['image_url']) : null;
                     }
                 }
+
+                // Generate personalized ingredients if member info is provided
+                // $item->generated_ingredients = $aiIngredientsEnabled
+                // ? app(self::class)->generateAiPersonalizedIngredients($item, $members)
+                // : null;
 
                 return $item;
             }),
@@ -106,6 +117,7 @@ class RecipeManageController extends Controller
             }
 
             $aiGeneratedIngredients = $this->generateAiPersonalizedIngredients($recipe, $members);
+            // dd($aiGeneratedIngredients);
         }
 
         return response()->json([
@@ -194,7 +206,7 @@ class RecipeManageController extends Controller
                             \"member_name\": \"Member Name\",
                             \"section_name\": \"Section Name\",
                             \"ingredients\": [
-                                { \"id\": 1, \"name\": \"Ingredient Name\", \"amount\": \"Amount in grams\" }
+                                { \"id\": 1, \"name\": \"Ingredient Name\",   \"amount\": \"Amount in grams\" }
                                 // ...
                             ]
                         }

@@ -231,6 +231,12 @@ Route::middleware(['auth:api'])->controller(ChatController::class)->prefix('auth
 Route::prefix('cms')->name('cms.')->group(function () {
     Route::get('home/how-it-works', [HomeController::class, 'how_work']);
     Route::get('home/section', [HomeController::class, 'home_section']);
+
+    Route::get('home/recipe/page/section', [HomeController::class, 'recipe_section']);
+    Route::get('home/contact/page/section', [HomeController::class, 'contact_section']);
+
     Route::get('home/personalized', [HomeController::class, 'personalized']);
+
+
     Route::get('home/customer-review', [HomeController::class, 'review']);
 });

@@ -497,7 +497,7 @@ class SubscriptionController extends Controller
     public function cancelSubscription(Request $request)
     {
         $user         = auth('api')->user();
-        $subscription = $user->subscriptions()->where('stripe_status', 'active')->first();
+        $subscription = $user->subscriptions()->whereIn('stripe_status',['active', 'paused'] )->first();
 
         if (! $subscription) {
             return response()->json([
