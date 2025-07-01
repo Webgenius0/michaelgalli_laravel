@@ -72,8 +72,22 @@ class HomeController extends Controller
 
     public function review()
     {
-       $review = CustomerReview::all();
-        return Helper::jsonResponse(true, 'Customer review retrive ', 200, $review);
+       $reviews = CustomerReview::all();
+
+
+        $data = $reviews->map(function ($review) {
+            return [
+                'id'   => $review->id,
+                'customer_name'       => $review->customer_name,
+                'customer_image'       => $review->customer_image ? url($review->customer_image) : null,
+                'content'       => $review->content ? $review->content: null,
+                'rating'       => $review->rating ? (int) $review->rating: null,
+
+            ];
+        });
+
+
+        return Helper::jsonResponse(true, 'Customer review retrive ', 200, $data);
 
     }
 }
