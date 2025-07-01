@@ -357,6 +357,7 @@ class SubscriptionController extends Controller
 
         // Get recipe_ids from UserRecipeCart
         $recipe_ids = UserRecipeCart::where('user_id', $user->id)->pluck('recipe_id')->toArray();
+        // dd($recipe_ids);
 
         if (empty($member_ids) || empty($recipe_ids)) {
             return response()->json([
@@ -412,7 +413,9 @@ class SubscriptionController extends Controller
                 ],
             ]);
 
-            // dd($checkoutSession);
+
+
+            dd($checkoutSession);
 
         } catch (\Exception $e) {
 

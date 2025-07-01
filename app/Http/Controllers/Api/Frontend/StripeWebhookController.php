@@ -1,20 +1,22 @@
 <?php
 namespace App\Http\Controllers\Api\Frontend;
 
-use App\Http\Controllers\Controller;
-use App\Models\MealPlan;
-use App\Models\Recipe;
-use App\Models\Subscription;
-use App\Models\SubscriptionFamilyMember;
+use OpenAI;
+use Stripe\Webhook;
 use App\Models\User;
-use App\Models\UserFamilyMember;
+use App\Models\Recipe;
+use App\Models\MealPlan;
+use Stripe\StripeClient;
+use App\Models\Subscription;
 use App\Models\UserPlanCart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use App\Models\OrderIngredient;
+use App\Models\UserFamilyMember;
 use Illuminate\Support\Facades\Log;
-use OpenAI;
-use Stripe\StripeClient;
-use Stripe\Webhook;
+use App\Http\Controllers\Controller;
+use App\Models\SubscriptionFamilyMember;
+use App\Models\UserRecipeCart;
 
 class StripeWebhookController extends Controller
 {
@@ -99,25 +101,17 @@ class StripeWebhookController extends Controller
                     $weekStart  = now()->startOfWeek();
                     $totalPrice = $mealPlan->recipes_per_week * $mealPlan->price_per_recipe;
 
-                    if (! $user->orders()->where('week_start', $weekStart)->exists() && $mealPlan) {
 
-                        // যদি customer checkout করার সময় ৩টি recipe নির্বাচন করে এবং Stripe Checkout Session এর metadata তে recipe IDs পাঠানো হয় (যেমন: recipe_ids = 5,9,13), তাহলে আপনি এই metadata থেকে ওই IDs read করে সেই অনুযায়ী $recipes পাবেন।
+                    if (!$user->orders()->where('week_start', $weekStart)->exists() && $mealPlan) {
 
-                        $recipeIdsString = $invoice->metadata->recipe_ids ?? '';
-                        $recipeIds       = array_filter(explode(',', $recipeIdsString));
 
-                        // if (! empty($recipeIds)) {
-                        // $recipes = Recipe::whereIn('id', $recipeIds)->get();
-                        // Log::info("Recipe List: ", $recipes);
-                        // } else {
-                        //     $recipes = Recipe::inRandomOrder()
-                        //         ->take($mealPlan->recipes_per_week)
-                        //         ->get();
-                        // }
+                        $user_recipe_carts = UserRecipeCart::where('user_id', $user->id)->get();
+                        $recipes = Recipe::where('id', $user_recipe_carts->recipe_id)->get();
 
-                        $recipes = Recipe::inRandomOrder()
-                            ->take(3)
-                            ->get();
+                        Log::info('New Recipe list: ', $recipes);
+
+
+                        $user_plan_carts = UserPlanCart::where('user_id', $user)->first();
 
                         $order = $user->orders()->create([
                             'week_start' => $weekStart,
@@ -126,12 +120,13 @@ class StripeWebhookController extends Controller
                             // 'pric'
                         ]);
 
+
                         foreach ($recipes as $recipe) {
 
                             $order->recipes()->create([
                                 'recipe_id' => $recipe->id,
                                 'quantity'  => 1,
-                                'price'     => $mealPlan->price_per_recipe ?? 0,
+                                'price'     => $user_plan_carts->price_per_serving ?? 0,
                                 'status'    => 'completed',
                             ]);
 
@@ -145,7 +140,7 @@ class StripeWebhookController extends Controller
                                     $preferences      = $this->getDietaryPreferences($member);
                                     $preferenceString = implode(', ', $preferences);
                                     $swapResult       = $this->swapIngredientWithAI($ingredient->title, $preferenceString);
-                                    $order_ingredient = \App\Models\OrderIngredient::create([
+                                    $order_ingredient = OrderIngredient::create([
                                         'order_id'              => $order->id,
                                         'recipe_id'             => $recipe->id,
                                         'user_family_member_id' => $member->id,
