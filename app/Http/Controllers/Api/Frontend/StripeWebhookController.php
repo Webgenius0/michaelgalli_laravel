@@ -1,21 +1,21 @@
 <?php
 namespace App\Http\Controllers\Api\Frontend;
 
-use OpenAI;
-use Stripe\Webhook;
-use App\Models\User;
-use App\Models\Recipe;
-use App\Models\MealPlan;
-use Stripe\StripeClient;
-use App\Models\Subscription;
-use App\Models\UserPlanCart;
-use Illuminate\Http\Request;
-use App\Models\UserRecipeCart;
-use Illuminate\Support\Carbon;
-use App\Models\UserFamilyMember;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Models\MealPlan;
+use App\Models\Recipe;
+use App\Models\Subscription;
 use App\Models\SubscriptionFamilyMember;
+use App\Models\User;
+use App\Models\UserFamilyMember;
+use App\Models\UserPlanCart;
+use App\Models\UserRecipeCart;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
+use OpenAI;
+use Stripe\StripeClient;
+use Stripe\Webhook;
 
 class StripeWebhookController extends Controller
 {
@@ -102,7 +102,6 @@ class StripeWebhookController extends Controller
 
                     if (! $user->orders()->where('week_start', $weekStart)->exists() && $mealPlan) {
 
-
                         $recipe_ids = UserRecipeCart::where('user_id', $user->id)->pluck('recipe_id')->toArray();
 
                         $recipes = Recipe::whereIn('id', $recipe_ids)->get();
@@ -146,7 +145,11 @@ class StripeWebhookController extends Controller
                                 }
                             }
                         }
+
                     }
+
+                    // $user_recipe_cart = UserRecipeCart::where('user_id', $user->id)->first();
+                    // $user_recipe_cart->delete();
                 }
                 break;
 
@@ -173,7 +176,7 @@ class StripeWebhookController extends Controller
 
     private function swapIngredientWithAI($ingredient, $preference)
     {
-        $prompt = "User follows a {$preference} diet. Suggest a suitable swap for the ingredient '{$ingredient}'. Only return the swap and reason.";
+        $prompt = "User follows a {$preference} diet. Suggest a suitable swap for the ingredient '{$ingredient}'. Only return the swap and reason. The reason must be no more than 10 words.";
 
         $response = OpenAI::client(config('services.openai.key'))->chat()->create([
             'model'    => 'gpt-4',
@@ -187,9 +190,17 @@ class StripeWebhookController extends Controller
 
         // Try parsing
         if (preg_match('/Swap:\s*(.*?)\s*[\r\n]+Reason:\s*(.*)/is', $text, $matches)) {
+            $reason = trim($matches[2]);
+
+            // Trim reason to 10 words max, if needed
+            $words = preg_split('/\s+/', $reason);
+            if (count($words) > 10) {
+                $reason = implode(' ', array_slice($words, 0, 10));
+            }
+
             return [
                 'swap'   => trim($matches[1]),
-                'reason' => trim($matches[2]),
+                'reason' => $reason,
             ];
         }
 
@@ -199,4 +210,5 @@ class StripeWebhookController extends Controller
             'reason' => $text,
         ];
     }
+
 }
