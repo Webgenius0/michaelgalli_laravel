@@ -415,7 +415,6 @@ class SubscriptionController extends Controller
 
 
 
-            dd($checkoutSession);
 
         } catch (\Exception $e) {
 
