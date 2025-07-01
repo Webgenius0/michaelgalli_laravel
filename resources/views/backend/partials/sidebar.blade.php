@@ -202,6 +202,19 @@
                     </ul>
 
                      <ul class="slide-menu">
+                        <li><a href="{{ route('admin.cms.home.recipe_page.index') }}" class="slide-item">
+                            Recipe page(Section)
+                        </a></li>
+                    </ul>
+
+                     <ul class="slide-menu">
+                        <li><a href="{{ route('admin.cms.home.contact_us_page.index') }}" class="slide-item">
+                            Contact Us page(Section)
+                        </a></li>
+                    </ul>
+
+
+                     <ul class="slide-menu">
                         <li><a href="{{ route('admin.cms.home.personalized.index') }}" class="slide-item">
                             Personalized(Section)
                         </a></li>

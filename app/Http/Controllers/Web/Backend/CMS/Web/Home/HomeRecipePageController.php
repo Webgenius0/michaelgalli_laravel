@@ -14,16 +14,16 @@ use Yajra\DataTables\DataTables;
 use App\Http\Requests\CmsRequest;
 use App\Services\CmsService;
 
-class HomePersonalizedController extends Controller
+class HomeRecipePageController extends Controller
 {
     protected $cmsService;
 
     public $name = "home";
-    public $section = "personalized";
+    public $section = "recipe_page";
     public $page = PageEnum::HOME;
-    public $item = SectionEnum::PERSONALIZED;
-    public $items = SectionEnum::PERSONALIZEDS;
-    public $count = 4;
+    public $item = SectionEnum::HOME_RECIPE_PAGE;
+    public $items = SectionEnum::HOME_RECIPE_PAGES;
+    public $count = 20;
 
     public function __construct(CmsService $cmsService)
     {

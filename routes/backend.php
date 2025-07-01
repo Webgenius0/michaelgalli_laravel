@@ -23,6 +23,7 @@ use App\Http\Controllers\Web\Backend\Access\UserController;
 use App\Http\Controllers\Web\Backend\SubcategoryController;
 use App\Http\Controllers\Web\Backend\TimeToClockController;
 use App\Http\Controllers\Web\Backend\WeeklyRecipeController;
+use App\Http\Controllers\Web\Backend\CustomerReviewController;
 use App\Http\Controllers\Web\Backend\MealPlanOptionController;
 use App\Http\Controllers\Web\Backend\Settings\OtherController;
 use App\Http\Controllers\Web\Backend\Settings\SocialController;
@@ -36,12 +37,12 @@ use App\Http\Controllers\Web\Backend\Settings\GoogleMapController;
 use App\Http\Controllers\Web\Backend\SubscriptionFeatureController;
 use App\Http\Controllers\Web\Backend\Settings\MailSettingController;
 use App\Http\Controllers\Web\Backend\CMS\Web\Home\HomeBannerController;
+use App\Http\Controllers\Web\Backend\CMS\Web\Home\HomeContactUsController;
 use App\Http\Controllers\Web\Backend\CMS\Web\Home\HomeHowToWorkController;
+use App\Http\Controllers\Web\Backend\CMS\Web\Home\HomeRecipePageController;
 use App\Http\Controllers\Web\Backend\CMS\Web\Home\HomePersonalizedController;
-use App\Http\Controllers\Web\Backend\CustomerReviewController;
 
 Route::get("dashboard", [DashboardController::class, 'index'])->name('dashboard');
-
 
 /*
 * CRUD
@@ -58,7 +59,6 @@ Route::controller(CategoryController::class)->prefix('category')->name('category
     Route::get('/status/{id}', 'status')->name('status');
 });
 
-
 Route::controller(ProteinController::class)->prefix('protein')->name('protein.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::get('/create', 'create')->name('create');
@@ -69,7 +69,6 @@ Route::controller(ProteinController::class)->prefix('protein')->name('protein.')
     Route::delete('/delete/{id}', 'destroy')->name('destroy');
     Route::get('/status/{id}', 'status')->name('status');
 });
-
 
 Route::controller(CaloriesController::class)->prefix('calories')->name('calories.')->group(function () {
     Route::get('/', 'index')->name('index');
@@ -82,7 +81,6 @@ Route::controller(CaloriesController::class)->prefix('calories')->name('calories
     Route::get('/status/{id}', 'status')->name('status');
 });
 
-
 Route::controller(CarbController::class)->prefix('carb')->name('carb.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::get('/create', 'create')->name('create');
@@ -94,7 +92,6 @@ Route::controller(CarbController::class)->prefix('carb')->name('carb.')->group(f
     Route::get('/status/{id}', 'status')->name('status');
 });
 
-
 Route::controller(CuisineController::class)->prefix('cuisine')->name('cuisine.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::get('/create', 'create')->name('create');
@@ -105,7 +102,6 @@ Route::controller(CuisineController::class)->prefix('cuisine')->name('cuisine.')
     Route::delete('/delete/{id}', 'destroy')->name('destroy');
     Route::get('/status/{id}', 'status')->name('status');
 });
-
 
 Route::controller(HealthGoalController::class)->prefix('health_goal')->name('health_goal.')->group(function () {
     Route::get('/', 'index')->name('index');
@@ -129,12 +125,6 @@ Route::controller(TimeToClockController::class)->prefix('time_to_clock')->name('
     Route::get('/status/{id}', 'status')->name('status');
 });
 
-
-
-
-
-
-
 Route::controller(SubcategoryController::class)->prefix('subcategory')->name('subcategory.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::get('/create', 'create')->name('create');
@@ -157,8 +147,6 @@ Route::controller(RecipeController::class)->prefix('recipe')->name('recipe.')->g
     Route::get('/status/{id}', 'status')->name('status');
 });
 
-
-
 Route::controller(CustomerReviewController::class)->prefix('review')->name('review.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::get('/create', 'create')->name('create');
@@ -170,13 +158,6 @@ Route::controller(CustomerReviewController::class)->prefix('review')->name('revi
     Route::get('/status/{id}', 'status')->name('status');
 });
 
-
-
-
-
-
-
-
 Route::controller(WeeklyRecipeController::class)->prefix('weekly-recipe')->name('weekly_recipe.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::get('/create', 'create')->name('create');
@@ -186,14 +167,11 @@ Route::controller(WeeklyRecipeController::class)->prefix('weekly-recipe')->name(
     Route::post('/update/{id}', 'update')->name('update');
     Route::get('/status/{id}', 'status')->name('status');
 
-
     Route::post('/recipe/add/{week_id}', 'add_recipe')->name('recipe.recipe_add');
     Route::delete('/recipe/delete/{id}', 'destroy')->name('recipe.delete');
 
 });
 
-
-
 Route::controller(MealPlanController::class)->prefix('meal-plan')->name('meal_plan.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::get('/create', 'create')->name('create');
@@ -205,7 +183,6 @@ Route::controller(MealPlanController::class)->prefix('meal-plan')->name('meal_pl
     Route::get('/status/{id}', 'status')->name('status');
 });
 
-
 Route::controller(MealPlanController::class)->prefix('meal-plan')->name('meal_plan.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::get('/create', 'create')->name('create');
@@ -216,7 +193,6 @@ Route::controller(MealPlanController::class)->prefix('meal-plan')->name('meal_pl
     Route::delete('/delete/{id}', 'destroy')->name('destroy');
     Route::get('/status/{id}', 'status')->name('status');
 });
-
 
 Route::controller(MealPlanOptionController::class)->prefix('meal-plan-options')->name('meal_plan_option.')->group(function () {
     Route::get('/', 'index')->name('index');
@@ -229,19 +205,12 @@ Route::controller(MealPlanOptionController::class)->prefix('meal-plan-options')-
     Route::get('/status/{id}', 'status')->name('status');
 });
 
-
-
-
 Route::controller(SubscriptionFeatureController::class)->prefix('feature')->name('feature.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::get('/create', 'create')->name('create');
     Route::post('/store', 'store')->name('store');
 
 });
-
-
-
-
 
 Route::controller(PostController::class)->prefix('post')->name('post.')->group(function () {
     Route::get('/', 'index')->name('index');
@@ -297,7 +266,6 @@ Route::controller(ContactController::class)->prefix('contact')->name('contact.')
     Route::get('/status/{id}', 'status')->name('status');
 });
 
-
 /*
 * CMS
 */
@@ -332,7 +300,6 @@ Route::prefix('cms')->name('cms.')->group(function () {
         Route::put('/content', 'content')->name('content');
     });
 
-
     Route::prefix('home/personalized')->name('home.personalized.')->controller(HomePersonalizedController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
@@ -344,6 +311,37 @@ Route::prefix('cms')->name('cms.')->group(function () {
         Route::get('/{id}/status', 'status')->name('status');
 
         Route::put('/content', 'content')->name('content');
+    });
+
+    //Home Banner
+    Route::prefix('home/recipe_page')->name('home.recipe_page.')->controller(HomeRecipePageController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{id}', 'show')->name('show');
+        Route::get('/{id}/edit', 'edit')->name('edit');
+        Route::patch('/{id}', 'update')->name('update');
+        Route::delete('/{id}', 'destroy')->name('destroy');
+        Route::get('/{id}/status', 'status')->name('status');
+
+        Route::put('/content', 'content')->name('content');
+
+    });
+
+
+     //Home Banner
+    Route::prefix('home/contact_us_page')->name('home.contact_us_page.')->controller(HomeContactUsController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{id}', 'show')->name('show');
+        Route::get('/{id}/edit', 'edit')->name('edit');
+        Route::patch('/{id}', 'update')->name('update');
+        Route::delete('/{id}', 'destroy')->name('destroy');
+        Route::get('/{id}/status', 'status')->name('status');
+
+        Route::put('/content', 'content')->name('content');
+
     });
 
 });
@@ -362,7 +360,6 @@ Route::controller(ChatController::class)->prefix('chat')->name('chat.')->group(f
     Route::get('/seen/all/{receiver_id}', 'seenAll');
     Route::get('/seen/single/{chat_id}', 'seenSingle');
 });
-
 
 /*
 * Users Access Route
