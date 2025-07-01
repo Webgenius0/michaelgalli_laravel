@@ -106,6 +106,8 @@ class StripeWebhookController extends Controller
 
 
                         $user_recipe_carts = UserRecipeCart::where('user_id', $user->id)->get();
+                        Log::info('New user Recipe list: ', $user_recipe_carts);
+
                         $recipes = Recipe::where('id', $user_recipe_carts->recipe_id)->get();
 
                         Log::info('New Recipe list: ', $recipes);
