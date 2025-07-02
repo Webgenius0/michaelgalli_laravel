@@ -171,6 +171,7 @@ Route::middleware(['auth:api'])->controller(SubscriptionController::class)->pref
     Route::post('/subscribe', 'subscribe');
     Route::post('/pause', 'pauseSubscription');
     Route::post('/cancel', 'cancelSubscription');
+    Route::post('/resume', 'resumePausedSubscription');
 
     // get subscription details
     Route::get('/details', 'subscriptionDetails');

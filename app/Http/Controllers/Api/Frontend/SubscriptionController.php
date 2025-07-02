@@ -359,7 +359,6 @@ class SubscriptionController extends Controller
         // Get recipe_ids from UserRecipeCart
         $recipe_ids = UserRecipeCart::where('user_id', $user->id)->pluck('recipe_id')->toArray();
 
-
         if (empty($member_ids) || empty($recipe_ids)) {
             return response()->json([
                 'status'  => false,
@@ -373,16 +372,16 @@ class SubscriptionController extends Controller
                 'user_id' => $user->id,
             ],
             [
-                'full_name' => $request->first_name . '' . $request->last_name,
-                'email'      => $request->email,
-                'phone'      => $request->phone,
+                'full_name'   => $request->first_name . '' . $request->last_name,
+                'email'       => $request->email,
+                'phone'       => $request->phone,
                 // Add any other billing fields here, e.g.:
-                'address'    => $request->address,
-                'city'       => $request->city,
-                'state'      => $request->state,
-                'postal_code'=> $request->postal_code,
-                'country'    => $request->country,
-                'land_mark'    => $request->land_mark,
+                'address'     => $request->address,
+                'city'        => $request->city,
+                'state'       => $request->state,
+                'postal_code' => $request->postal_code,
+                'country'     => $request->country,
+                'land_mark'   => $request->land_mark,
             ]
         );
 
@@ -413,9 +412,6 @@ class SubscriptionController extends Controller
                     'recipe_ids'   => implode(',', $recipe_ids), // Example: [5, 9, 13]
                 ],
             ]);
-
-
-
 
         } catch (\Exception $e) {
 
@@ -497,7 +493,7 @@ class SubscriptionController extends Controller
     public function cancelSubscription(Request $request)
     {
         $user         = auth('api')->user();
-        $subscription = $user->subscriptions()->whereIn('stripe_status',['active', 'paused'] )->first();
+        $subscription = $user->subscriptions()->whereIn('stripe_status', ['active', 'paused'])->first();
 
         if (! $subscription) {
             return response()->json([
@@ -520,6 +516,50 @@ class SubscriptionController extends Controller
             'data'    => $stripeSub,
         ], 200);
 
+    }
+
+    public function resumePausedSubscription(Request $request)
+    {
+        $user = auth('api')->user();
+
+        $subscription = $user->subscriptions()
+            ->where('stripe_status', 'paused')
+            ->first();
+
+        if (! $subscription) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'No paused subscription found.',
+                'data'    => [],
+            ], 404);
+        }
+
+        try {
+            // Resume Stripe subscription (remove pause_collection)
+            $stripeSub = $this->stripe->subscriptions->update(
+                $subscription->stripe_subscription_id,
+                [
+                    'pause_collection' => '', // Remove the pause
+                ]
+            );
+
+            // Update local DB
+            $subscription->stripe_status = 'active';
+            $subscription->save();
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Subscription resumed successfully.',
+                'data'    => $stripeSub,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Failed to resume subscription: ' . $e->getMessage(),
+                'data'    => [],
+            ], 500);
+        }
     }
 
     public function subscriptionDetails()
@@ -552,12 +592,12 @@ class SubscriptionController extends Controller
         $user_plan = UserPlanCart::where('user_id', $user->id)->first();
 
         $data = [
-            'plan_name'     => $plan->name,       // e.g., Family Plan
+            'plan_name'     => $plan->name,                  // e.g., Family Plan
             'price'         => $user_plan->total_price ?? 0, // e.g., 100.00
             'currency'      => $plan->currency ?? 'AED',
             'billing_cycle' => $plan->billing_cycle ?? 'weekly', // weekly, monthly etc.
                                                                  // 'servings'      => $plan->servings_per_week,         // e.g., 16
-            'meals'         => $user_plan->recipes_per_week,          // e.g., 4
+            'meals'         => $user_plan->recipes_per_week,     // e.g., 4
             'people'        => $user_plan->people_count ?? 4,
 
             'features'      => [
