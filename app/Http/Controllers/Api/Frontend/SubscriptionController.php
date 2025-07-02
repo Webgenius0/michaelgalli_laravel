@@ -510,6 +510,11 @@ class SubscriptionController extends Controller
         $subscription->stripe_status = 'canceled';
         $subscription->save();
 
+        // Clear related carts
+        UserRecipeCart::where('user_id', $user->id)->delete();
+        UserPlanCart::where('user_id', $user->id)->delete();
+        UserFamilyCart::where('user_id', $user->id)->delete();
+
         return response()->json([
             'status'  => true,
             'message' => 'Subscription cancelled successfully.',

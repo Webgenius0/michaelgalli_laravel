@@ -37,7 +37,7 @@
                 </li>
 
 
-                 <li class="slide">
+                <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('admin.meal_plan.*') ? 'active' : '' }}"
                         href="{{ route('admin.meal_plan.index') }}">
 
@@ -47,8 +47,10 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 512 512"
                             fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                             stroke-width="32">
-                            <path d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208s208-93.1 208-208S370.9 48 256 48zM256 416c-88.4 0-160-71.6-160-160s71.6-160 160-160s160 71.6 160 160s-71.6 160-160 160z" />
-                            <path d="M256 128c-70.7 0-128 57.3-128 128s57.3 128 128 128s128-57.3 128-128S326.7 128 256 128zM256 352c-52.9 0-96-43.1-96-96s43.1-96 96-96s96 43.1 96 96s-43.1 96-96 96z" />
+                            <path
+                                d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208s208-93.1 208-208S370.9 48 256 48zM256 416c-88.4 0-160-71.6-160-160s71.6-160 160-160s160 71.6 160 160s-71.6 160-160 160z" />
+                            <path
+                                d="M256 128c-70.7 0-128 57.3-128 128s57.3 128 128 128s128-57.3 128-128S326.7 128 256 128zM256 352c-52.9 0-96-43.1-96-96s43.1-96 96-96s96 43.1 96 96s-43.1 96-96 96z" />
                         </svg>
 
                         <span class="side-menu__label">Meal Plan</span>
@@ -65,8 +67,10 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 512 512"
                             fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                             stroke-width="32">
-                            <path d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208s208-93.1 208-208S370.9 48 256 48zM256 416c-88.4 0-160-71.6-160-160s71.6-160 160-160s160 71.6 160 160s-71.6 160-160 160z" />
-                            <path d="M256 128c-70.7 0-128 57.3-128 128s57.3 128 128 128s128-57.3 128-128S326.7 128 256 128zM256 352c-52.9 0-96-43.1-96-96s43.1-96 96-96s96 43.1 96 96s-43.1 96-96 96z" />
+                            <path
+                                d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208s208-93.1 208-208S370.9 48 256 48zM256 416c-88.4 0-160-71.6-160-160s71.6-160 160-160s160 71.6 160 160s-71.6 160-160 160z" />
+                            <path
+                                d="M256 128c-70.7 0-128 57.3-128 128s57.3 128 128 128s128-57.3 128-128S326.7 128 256 128zM256 352c-52.9 0-96-43.1-96-96s43.1-96 96-96s96 43.1 96 96s-43.1 96-96 96z" />
                         </svg>
 
                         <span class="side-menu__label">Meal Plan Option</span>
@@ -84,8 +88,10 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 512 512"
                             fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                             stroke-width="32">
-                            <path d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208s208-93.1 208-208S370.9 48 256 48zM256 416c-88.4 0-160-71.6-160-160s71.6-160 160-160s160 71.6 160 160s-71.6 160-160 160z" />
-                            <path d="M256 128c-70.7 0-128 57.3-128 128s57.3 128 128 128s128-57.3 128-128S326.7 128 256 128zM256 352c-52.9 0-96-43.1-96-96s43.1-96 96-96s96 43.1 96 96s-43.1 96-96 96z" />
+                            <path
+                                d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208s208-93.1 208-208S370.9 48 256 48zM256 416c-88.4 0-160-71.6-160-160s71.6-160 160-160s160 71.6 160 160s-71.6 160-160 160z" />
+                            <path
+                                d="M256 128c-70.7 0-128 57.3-128 128s57.3 128 128 128s128-57.3 128-128S326.7 128 256 128zM256 352c-52.9 0-96-43.1-96-96s43.1-96 96-96s96 43.1 96 96s-43.1 96-96 96z" />
                         </svg>
 
                         <span class="side-menu__label">Subscirtion Feature</span>
@@ -101,7 +107,7 @@
                 </li>
 
 
-                 <li class="slide">
+                <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('weekly_recipe') ? 'has-link' : '' }}"
                         href="{{ route('admin.weekly_recipe.create') }}">
                         <i class="fa-solid fa-calendar-week side-menu__icon"></i>
@@ -112,7 +118,15 @@
 
 
                 @php
-                    $isRecipeActive = request()->routeIs('admin.category.*','admin.protein.*','admin.time_to_clock.*', 'admin.cuisine.*','admin.health_goal.*', 'admin.calories.*', 'admin.carb.*');
+                    $isRecipeActive = request()->routeIs(
+                        'admin.category.*',
+                        'admin.protein.*',
+                        'admin.time_to_clock.*',
+                        'admin.cuisine.*',
+                        'admin.health_goal.*',
+                        'admin.calories.*',
+                        'admin.carb.*',
+                    );
                 @endphp
 
                 <li class="slide {{ $isRecipeActive ? 'is-expanded' : '' }}">
@@ -168,7 +182,7 @@
                             </a>
                         </li>
 
-                         <li>
+                        <li>
                             <a href="{{ route('admin.time_to_clock.index') }}"
                                 class="slide-item {{ request()->routeIs('admin.time_to_clock.*') ? 'active' : '' }}">
                                 Time To Clock
@@ -197,39 +211,58 @@
 
                     <ul class="slide-menu">
                         <li><a href="{{ route('admin.cms.home.how_it_work.index') }}" class="slide-item">
-                            How it work(Section)
-                        </a></li>
+                                How it work(Section)
+                            </a></li>
                     </ul>
 
-                     <ul class="slide-menu">
+                    <ul class="slide-menu">
                         <li><a href="{{ route('admin.cms.home.recipe_page.index') }}" class="slide-item">
-                            Recipe page(Section)
-                        </a></li>
+                                Recipe page(Section)
+                            </a></li>
                     </ul>
 
-                     <ul class="slide-menu">
+                    <ul class="slide-menu">
                         <li><a href="{{ route('admin.cms.home.contact_us_page.index') }}" class="slide-item">
-                            Contact Us page(Section)
-                        </a></li>
+                                Contact Us page(Section)
+                            </a></li>
                     </ul>
 
 
-                     <ul class="slide-menu">
+                    <ul class="slide-menu">
                         <li><a href="{{ route('admin.cms.home.personalized.index') }}" class="slide-item">
-                            Personalized(Section)
-                        </a></li>
+                                Personalized(Section)
+                            </a></li>
                     </ul>
 
 
                     <ul class="slide-menu">
                         <li><a href="{{ route('admin.review.index') }}" class="slide-item">
-                            Customer Review(Section)
-                        </a></li>
+                                Customer Review(Section)
+                            </a></li>
                     </ul>
 
 
 
 
+                </li>
+
+                <hr>
+
+
+
+                <li class="slide">
+                    <a class="side-menu__item" data-bs-toggle="slide" href="#">
+                        {{-- Order Management icon --}}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" width="24"
+                            height="24" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M7 18c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zm10 0c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zM7.334 16h9.332c.828 0 1.554-.502 1.857-1.267l3.358-8.029A1 1 0 0 0 21 5H6.21l-.94-2.342A1 1 0 0 0 4.382 2H2a1 1 0 1 0 0 2h1.382l3.6 8.982-1.35 2.447A2 2 0 0 0 7 18zm11.24-10-2.7 6.457A1 1 0 0 1 14.667 13H8.333l1.1-2h6.267a1 1 0 0 0 .95-.684l1.59-3.816A1 1 0 0 0 18.24 6z" />
+                        </svg>
+                        <span class="side-menu__label">Order Management</span><i class="angle fa fa-angle-right"></i>
+                    </a>
+                    <ul class="slide-menu">
+                        <li><a href="{{ route('admin.orders.index') }}" class="slide-item">Total Orders</a></li>
+                    </ul>
                 </li>
 
 

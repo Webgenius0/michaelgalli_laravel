@@ -110,7 +110,7 @@ class StripeWebhookController extends Controller
 
                         $order = $user->orders()->create([
                             'week_start' => $weekStart,
-                            'status'     => 'completed',
+                            'status'     => 'pending',
                             'price'      => $totalPrice,
                             // 'pric'
                         ]);
@@ -121,7 +121,7 @@ class StripeWebhookController extends Controller
                                 'recipe_id' => $recipe->id,
                                 'quantity'  => 1,
                                 'price'     => $user_plan_cart->price_per_serving ?? 0,
-                                'status'    => 'completed',
+                                'status'    => 'pending',
                             ]);
 
                             // ai generate swap ingredients

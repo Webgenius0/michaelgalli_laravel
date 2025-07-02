@@ -26,6 +26,7 @@ use App\Http\Controllers\Web\Backend\WeeklyRecipeController;
 use App\Http\Controllers\Web\Backend\CustomerReviewController;
 use App\Http\Controllers\Web\Backend\MealPlanOptionController;
 use App\Http\Controllers\Web\Backend\Settings\OtherController;
+use App\Http\Controllers\Web\Backend\OrderManagementController;
 use App\Http\Controllers\Web\Backend\Settings\SocialController;
 use App\Http\Controllers\Web\Backend\Settings\StripeController;
 use App\Http\Controllers\Web\Backend\Settings\CaptchaController;
@@ -183,7 +184,7 @@ Route::controller(MealPlanController::class)->prefix('meal-plan')->name('meal_pl
     Route::get('/status/{id}', 'status')->name('status');
 });
 
-Route::controller(MealPlanController::class)->prefix('meal-plan')->name('meal_plan.')->group(function () {
+Route::controller(OrderManagementController::class)->prefix('orders')->name('orders.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::get('/create', 'create')->name('create');
     Route::post('/store', 'store')->name('store');
@@ -193,6 +194,8 @@ Route::controller(MealPlanController::class)->prefix('meal-plan')->name('meal_pl
     Route::delete('/delete/{id}', 'destroy')->name('destroy');
     Route::get('/status/{id}', 'status')->name('status');
 });
+
+
 
 Route::controller(MealPlanOptionController::class)->prefix('meal-plan-options')->name('meal_plan_option.')->group(function () {
     Route::get('/', 'index')->name('index');
