@@ -513,9 +513,7 @@ class SubscriptionController extends Controller
 
 
         $order = Order::where('user_id', $user->id)->first();
-        $order->status = 'canceled';
-        $order->save();
-
+        $order->delete();
 
 
 
