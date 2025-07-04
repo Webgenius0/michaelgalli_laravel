@@ -602,7 +602,7 @@ class SubscriptionController extends Controller
             'currency'      => $plan->currency ?? 'AED',
             'billing_cycle' => $plan->billing_cycle ?? 'weekly', // weekly, monthly etc.
                                                                  // 'servings'      => $plan->servings_per_week,         // e.g., 16
-            'meals'         => $user_plan->recipes_per_week,     // e.g., 4
+            'meals'         => $user_plan->recipes_per_week ?? 0,     // e.g., 4
             'people'        => $user_plan->people_count ?? 4,
 
             'features'      => [
