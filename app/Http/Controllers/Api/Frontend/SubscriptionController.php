@@ -359,13 +359,13 @@ class SubscriptionController extends Controller
         // Get recipe_ids from UserRecipeCart
         $recipe_ids = UserRecipeCart::where('user_id', $user->id)->pluck('recipe_id')->toArray();
 
-        if (empty($member_ids) || empty($recipe_ids)) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Cart must have at least one member and one recipe.',
-                'data'    => [],
-            ], 422);
-        }
+        // if (empty($member_ids) || empty($recipe_ids)) {
+        //     return response()->json([
+        //         'status'  => false,
+        //         'message' => 'Cart must have at least one member and one recipe.',
+        //         'data'    => [],
+        //     ], 422);
+        // }
 
         BillingInformation::updateOrCreate(
             [
@@ -518,7 +518,7 @@ class SubscriptionController extends Controller
         return response()->json([
             'status'  => true,
             'message' => 'Subscription cancelled successfully.',
-            'data'    => $stripeSub,
+            'data'    => [],
         ], 200);
 
     }
