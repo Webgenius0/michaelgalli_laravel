@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BillingInformation;
 use App\Models\MealPlan;
 use App\Models\MealPlanOption;
+use App\Models\Order;
 use App\Models\Recipe;
 use App\Models\SubscriptionFeature;
 use App\Models\UserFamilyCart;
@@ -509,6 +510,14 @@ class SubscriptionController extends Controller
         // Update local DB
         $subscription->stripe_status = 'canceled';
         $subscription->save();
+
+
+        $order = Order::where('user_id', $user->id)->first();
+        $order->status = 'canceled';
+        $order->save();
+
+
+
 
         // Clear related carts
         // UserRecipeCart::where('user_id', $user->id)->delete();
