@@ -511,9 +511,9 @@ class SubscriptionController extends Controller
         $subscription->save();
 
         // Clear related carts
-        UserRecipeCart::where('user_id', $user->id)->delete();
-        UserPlanCart::where('user_id', $user->id)->delete();
-        UserFamilyCart::where('user_id', $user->id)->delete();
+        // UserRecipeCart::where('user_id', $user->id)->delete();
+        // UserPlanCart::where('user_id', $user->id)->delete();
+        // UserFamilyCart::where('user_id', $user->id)->delete();
 
         return response()->json([
             'status'  => true,
