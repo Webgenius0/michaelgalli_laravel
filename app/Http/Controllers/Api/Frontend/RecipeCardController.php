@@ -226,7 +226,7 @@ class RecipeCardController extends Controller
         $orders = Order::with('recipes')->latest()->paginate($perPage);
 
         if ($orders->isEmpty()) {
-            return $this->error([], 'No Order is Found', 404);
+            return $this->success([], 'No Order is Found', 200);
         }
 
         $data = $orders->getCollection()->map(function ($order) {
