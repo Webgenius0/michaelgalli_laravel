@@ -60,10 +60,11 @@ class StripeWebhookController extends Controller
                     $cart = UserPlanCart::where('user_id', $user->id)->first();
 
                     $sub = Subscription::updateOrCreate(
-                        ['stripe_subscription_id' => $subscription->id,
+                        [
                             'user_id'                 => $user->id,
                         ],
                         [
+                            'stripe_subscription_id' => $subscription->id,
                             'meal_plan_id'  => $cart->meal_plan_id ?? null,
                             'type'          => 'stripe',
                             'stripe_status' => $subscription->status,
